@@ -1,0 +1,96 @@
+syntax = "proto3";
+package rtJsonSync;
+
+enum Operation {
+  ADD = 0;
+  DEL = 1;
+  MOD = 2;
+}
+
+enum TargetType {
+  DOCUMENT = 0;
+  STATE = 1;
+}
+
+enum DataType {
+  STRING = 0;
+  NUMBER = 1;
+  OBJECT = 2;
+}
+
+enum ReqType {
+  ALL_ACCOUNT = 0;
+}
+
+message Open {
+  string jwt = 1;
+  string accountInfo = 2;
+}
+
+message Connected {
+  string sessionId = 1;
+  bool hasInitialData = 2;
+  string data = 3;
+}
+
+message Close {
+  int32 reason = 1;
+}
+
+message Request {
+  int32 type = 1;
+}
+
+message AccountAll {
+  string documentName = 1;
+  string allAccounts = 2;
+}
+
+message AccountUpdate {
+  string accountInfo = 1;
+}
+
+message AccountNotify {
+  string sessionId = 1;
+  Operation opType = 2;
+  string accountInfo = 3;
+}
+
+message DocumentUpload {
+  string data = 1;
+}
+
+message DataUpdate {
+  TargetType target = 1;
+  Operation opType = 2;
+  DataType type = 3;
+  string targetKey = 4;
+  string data = 5;
+}
+
+message Message {
+  enum MessageType {
+    OPEN = 0;
+    CONNECTED = 1;
+    CLOSE = 2;
+    REQUEST = 3;
+    ACCOUNT_ALL = 4;
+    ACCOUNT_UPDATE = 5;
+    ACCOUNT_NOTIFY = 6;
+    DOCUMENT_UPLOAD = 7;
+    DATA_UPDATE = 8;
+  }
+  MessageType msgType = 1;
+
+  oneof body {
+    Open open = 2;
+    Connected connected = 3;
+    Close close = 4;
+    Request request = 5;
+    AccountAll accountAll = 6;
+    AccountUpdate accountUpdate = 7;
+    AccountNotify accountNotify = 8;
+    DocumentUpload doc = 9;
+    DataUpdate data = 10;
+  }
+}

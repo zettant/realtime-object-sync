@@ -61,7 +61,7 @@
 
 ## オブジェクト同期の動作イメージ
 
-![sync_image](./images/sync_image.png)
+![sync_image](images/sync_image.png)
 
 
 
