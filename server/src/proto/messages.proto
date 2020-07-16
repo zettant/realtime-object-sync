@@ -12,12 +12,6 @@ enum TargetType {
   STATE = 1;
 }
 
-enum DataType {
-  STRING = 0;
-  NUMBER = 1;
-  OBJECT = 2;
-}
-
 enum ReqType {
   ALL_ACCOUNT = 0;
 }
@@ -61,11 +55,12 @@ message DocumentUpload {
 }
 
 message DataUpdate {
-  TargetType target = 1;
-  Operation opType = 2;
-  DataType type = 3;
-  string targetKey = 4;
-  string data = 5;
+  string sessionId = 1;
+  TargetType target = 2;
+  Operation opType = 3;
+  uint32 revision = 4;
+  string targetKey = 5;
+  string data = 6;
 }
 
 message Message {

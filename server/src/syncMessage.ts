@@ -112,9 +112,9 @@ export const sendDocumentUploadMessage = (ws: any, data: any) => {
 }
 
 
-export const createDataUpdateMessage = (target: number, opType: number, type: number, targetKey: string, data: any) => {
+export const createDataUpdateMessage = (sessionId: string, target: number, opType: number, revision: number, targetKey: any, data: any) => {
   return createMessage({
     msgType: rtJsonSync.Message.MessageType.DATA_UPDATE,
-    data: {target, opType, type, targetKey, data}
+    data: {sessionId, target, opType, revision, targetKey: JSON.stringify(targetKey), data: JSON.stringify(data)}
   });
 }

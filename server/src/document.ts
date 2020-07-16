@@ -26,9 +26,10 @@ import {Logger} from './logger';
 import {ExtWebSocket} from './extWebsock';
 import {rtJsonSync} from "./proto/messages";
 import {
-  createAccountNotifyMessage,
+  createAccountNotifyMessage, createDataUpdateMessage,
   sendAccountAllMessage, sendConnectedMessage
 } from "./syncMessage";
+import {IDataUpdate} from './server';
 
 export class SyncDocument {
   private readonly documentName: string;
@@ -87,5 +88,43 @@ export class SyncDocument {
     const message = createAccountNotifyMessage(sessionId, rtJsonSync.Operation.MOD, this.accounts[sessionId]);
     console.log(this.accounts[sessionId])
     this.broadcast(message, sessionId);
+  }
+
+  updateState = (ws: ExtWebSocket, info: IDataUpdate) => {
+    const sessionId = this.users.get(ws);
+    if (!sessionId) return;
+
+    info.data = JSON.parse(info.data);
+    const keyArray: any = JSON.parse(info.targetKey);
+    if (!keyArray) return;
+    if (keyArray.length === 0) {
+      this.states[sessionId] = info.data;
+    }
+    else {
+      let target: any = this.states[sessionId];
+      const lastKey: string = keyArray.pop();
+      for (let i = 0; i < keyArray.length; i++) {
+        if (!target || !target.hasOwnProperty(keyArray[i])) {
+          target = null;
+          break;
+        }
+        target = target[keyArray[i]];
+      }
+      if (!target) return;
+      if (info.opType === rtJsonSync.Operation.DEL) {
+        // @ts-ignore
+        delete target[lastKey];
+      } else {
+        target[lastKey] = info.data;
+      }
+      keyArray.push(lastKey)
+    }
+
+    const message = createDataUpdateMessage(sessionId, info.target, info.opType, info.revision, keyArray, info.data);
+    this.broadcast(message, sessionId);
+  }
+
+  updateDocument = (ws: ExtWebSocket, info: IDataUpdate) => {
+
   }
 }

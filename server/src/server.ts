@@ -30,6 +30,15 @@ import {SyncDocument} from './document';
 import {sendCloseMessage} from './syncMessage';
 
 
+export interface IDataUpdate {
+  sessionId: string,
+  target: number,
+  opType: number,
+  revision: number,
+  targetKey: string,
+  data: string
+}
+
 export class SyncServer {
   private documents: {[key: string]: SyncDocument} = {};
   private wsDocMap: Map<ExtWebSocket, string>;  // mapping between websocket and documentName
@@ -75,6 +84,7 @@ export class SyncServer {
         break;
 
       case rtJsonSync.Message.MessageType.DATA_UPDATE:
+        this.updateData(ws, decodedMessage.data)
         break;
     }
   }
@@ -133,5 +143,16 @@ export class SyncServer {
   setDocument = (ws: ExtWebSocket, data: string) => {
     const doc = this.wsDocMap.get(ws);
     if (doc) this.documents[doc].setDocument(data);
+  }
+
+  updateData = (ws: ExtWebSocket, info: IDataUpdate) => {
+    const doc = this.wsDocMap.get(ws);
+    if (!doc) return;
+
+    if (info.target === rtJsonSync.TargetType.STATE) {
+      this.documents[doc].updateState(ws, info);
+    } else if (info.target === rtJsonSync.TargetType.DOCUMENT) {
+      this.documents[doc].updateDocument(ws, info);
+    }
   }
 }
