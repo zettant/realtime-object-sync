@@ -13,6 +13,7 @@
     "build": "yarn proto && tsc -p .",
     "build:live": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/index.ts",
     "test": "yarn proto && cross-env NODE_ENV=test jest --coverage --no-cache --runInBand",
+    "testcache": "jest --clearCache",
     "keypair": "openssl ecparam -genkey -name prime256v1 -out tmp-keypair.pem && openssl ec -in tmp-keypair.pem -outform PEM -pubout -out testPubkey.pem && openssl ec -in tmp-keypair.pem -outform PEM -out testSeckey.pem && rm -f tmp-keypair.pem"
   },
   "devDependencies": {

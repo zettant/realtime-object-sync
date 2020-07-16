@@ -55,14 +55,14 @@ describe('server test (for state related features)', () => {
     expect(decoded.accountNotify.opType).toBe(rtJsonSync.Operation.ADD);
 
     // ---- test1 send its initial state
-    const message = createDataUpdateMessage(
-      "",
-      rtJsonSync.TargetType.STATE,
-      rtJsonSync.Operation.ADD,
-      0,
-      [],
-      {"pointer": [10, 20], "color": "blue"}
-      );
+    const message = createDataUpdateMessage({
+      sessionId: '',
+      target: rtJsonSync.TargetType.STATE,
+      opType: rtJsonSync.Operation.ADD,
+      revision: 0,
+      targetKey: [],
+      data: {"pointer": [10, 20], "color": "blue"}
+    });
     sockets[0].send(message);
 
     //    -> test2 receives notification

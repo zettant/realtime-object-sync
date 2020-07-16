@@ -35,8 +35,8 @@ export interface IDataUpdate {
   target: number,
   opType: number,
   revision: number,
-  targetKey: string,
-  data: string
+  targetKey: any,
+  data?: any
 }
 
 export class SyncServer {
@@ -93,9 +93,16 @@ export class SyncServer {
     const doc = this.wsDocMap.get(ws);
     if (!doc || !this.documents[doc]) return;
     this.documents[doc].delUser(ws);
-    if (this.documents[doc].getCount() === 0) delete this.documents[doc];
+    if (this.documents[doc].getCount() === 0) {
+      this.beforeDocumentDelete(doc);
+      delete this.documents[doc];
+      this.afterDocumentDelete(doc);
+    }
     this.wsDocMap.delete(ws);
   }
+
+  beforeDocumentDelete = (documentName: string) => {}
+  afterDocumentDelete = (documentName: string) => {}
 
   incrementSessionId = () => {
     this.nextSessionId = `${(parseInt(this.nextSessionId, 10) + 1) % 10000000}`;

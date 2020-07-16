@@ -90,18 +90,17 @@ export class SyncDocument {
     this.broadcast(message, sessionId);
   }
 
-  updateState = (ws: ExtWebSocket, info: IDataUpdate) => {
-    const sessionId = this.users.get(ws);
-    if (!sessionId) return;
 
+  updateData = (target: any, sessionId: string, info: IDataUpdate): IDataUpdate|null => {
     info.data = JSON.parse(info.data);
     const keyArray: any = JSON.parse(info.targetKey);
-    if (!keyArray) return;
+    if (!keyArray) return null;
+
     if (keyArray.length === 0) {
-      this.states[sessionId] = info.data;
+      target[sessionId] = info.data;
     }
     else {
-      let target: any = this.states[sessionId];
+      target = target[sessionId];
       const lastKey: string = keyArray.pop();
       for (let i = 0; i < keyArray.length; i++) {
         if (!target || !target.hasOwnProperty(keyArray[i])) {
@@ -110,7 +109,7 @@ export class SyncDocument {
         }
         target = target[keyArray[i]];
       }
-      if (!target) return;
+      if (!target) return null;
       if (info.opType === rtJsonSync.Operation.DEL) {
         // @ts-ignore
         delete target[lastKey];
@@ -120,8 +119,18 @@ export class SyncDocument {
       keyArray.push(lastKey)
     }
 
-    const message = createDataUpdateMessage(sessionId, info.target, info.opType, info.revision, keyArray, info.data);
-    this.broadcast(message, sessionId);
+    return {sessionId, target: info.target, opType: info.opType, revision: info.revision, targetKey: keyArray, data: info.data};
+  }
+
+  updateState = (ws: ExtWebSocket, info: IDataUpdate) => {
+    const sessionId = this.users.get(ws);
+    if (!sessionId) return;
+
+    const infoToNotify: IDataUpdate|null = this.updateData(this.states, sessionId, info);
+    if (!infoToNotify) return;
+
+    this.broadcast(createDataUpdateMessage(infoToNotify), sessionId);
+    console.log(this.states);
   }
 
   updateDocument = (ws: ExtWebSocket, info: IDataUpdate) => {

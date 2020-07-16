@@ -1,4 +1,5 @@
 import {rtJsonSync} from "./proto/messages";
+import {IDataUpdate} from "./server";
 
 /**
  MIT License
@@ -112,9 +113,17 @@ export const sendDocumentUploadMessage = (ws: any, data: any) => {
 }
 
 
-export const createDataUpdateMessage = (sessionId: string, target: number, opType: number, revision: number, targetKey: any, data: any) => {
+export const createDataUpdateMessage = (info: IDataUpdate) => {
+  if (!info.data) info.data = null;
   return createMessage({
     msgType: rtJsonSync.Message.MessageType.DATA_UPDATE,
-    data: {sessionId, target, opType, revision, targetKey: JSON.stringify(targetKey), data: JSON.stringify(data)}
+    data: {
+      sessionId: info.sessionId,
+      target: info.target,
+      opType: info.opType,
+      revision: info.revision,
+      targetKey: JSON.stringify(info.targetKey),
+      data: JSON.stringify(info.data)
+    }
   });
 }

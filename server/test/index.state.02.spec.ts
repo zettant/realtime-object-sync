@@ -57,14 +57,14 @@ describe('server test (for state related features)', () => {
     expect(decoded.accountNotify.opType).toBe(rtJsonSync.Operation.ADD);
 
     // ---- test1 sends its initial state
-    message = createDataUpdateMessage(
-      "",
-      rtJsonSync.TargetType.STATE,
-      rtJsonSync.Operation.ADD,
-      0,
-      [],
-      {"pointer": [10, 20], "color": "blue", "hierarchy": {"x": [100, 3000], "y": 200}}
-      );
+    message = createDataUpdateMessage({
+      sessionId: '',
+      target: rtJsonSync.TargetType.STATE,
+      opType: rtJsonSync.Operation.ADD,
+      revision: 0,
+      targetKey: [],
+      data: {"pointer": [10, 20], "color": "blue", "hierarchy": {"x": [100, 3000], "y": 200}}
+    });
     sockets[0].send(message);
 
     //    -> test2 receives notification
@@ -77,14 +77,14 @@ describe('server test (for state related features)', () => {
     expect(data.color).toBe('blue');
 
     // ---- test1 changes state
-    message = createDataUpdateMessage(
-      "",
-      rtJsonSync.TargetType.STATE,
-      rtJsonSync.Operation.ADD,
-      0,
-      ["color"],
-      "red"
-    );
+    message = createDataUpdateMessage({
+      sessionId: '',
+      target: rtJsonSync.TargetType.STATE,
+      opType: rtJsonSync.Operation.ADD,
+      revision: 0,
+      targetKey: ["color"],
+      data: "red"
+    });
     sockets[0].send(message);
 
     //    -> test2 receives notification
@@ -98,14 +98,14 @@ describe('server test (for state related features)', () => {
     expect(data).toBe('red');
 
     // ---- test1 changes state
-    message = createDataUpdateMessage(
-      "",
-      rtJsonSync.TargetType.STATE,
-      rtJsonSync.Operation.ADD,
-      0,
-      ["hierarchy", "x"],
-      [2, 5]
-    );
+    message = createDataUpdateMessage({
+      sessionId: '',
+      target: rtJsonSync.TargetType.STATE,
+      opType: rtJsonSync.Operation.ADD,
+      revision: 0,
+      targetKey: ["hierarchy", "x"],
+      data: [2, 5]
+    });
     sockets[0].send(message);
 
     //    -> test2 receives notification
@@ -121,14 +121,14 @@ describe('server test (for state related features)', () => {
     expect(data[1]).toBe(5);
 
     // ---- test1 changes state
-    message = createDataUpdateMessage(
-      "",
-      rtJsonSync.TargetType.STATE,
-      rtJsonSync.Operation.ADD,
-      0,
-      ["hierarchy", "z"],
-      {"z1": 100}
-    );
+    message = createDataUpdateMessage({
+      sessionId: '',
+      target: rtJsonSync.TargetType.STATE,
+      opType: rtJsonSync.Operation.ADD,
+      revision: 0,
+      targetKey: ["hierarchy", "z"],
+      data: {"z1": 100}
+    });
     sockets[0].send(message);
 
     //    -> test2 receives notification
@@ -144,14 +144,13 @@ describe('server test (for state related features)', () => {
 
 
     // ---- test1 changes state
-    message = createDataUpdateMessage(
-      "",
-      rtJsonSync.TargetType.STATE,
-      rtJsonSync.Operation.DEL,
-      0,
-      ["hierarchy", "z"],
-      null
-    );
+    message = createDataUpdateMessage({
+      sessionId: '',
+      target: rtJsonSync.TargetType.STATE,
+      opType: rtJsonSync.Operation.DEL,
+      revision: 0,
+      targetKey: ["hierarchy", "z"]
+    });
     sockets[0].send(message);
 
     //    -> test2 receives notification
