@@ -103,7 +103,7 @@ export const createAccountNotifyMessage = (sessionId: string, opType: number, ac
 }
 
 
-export const sendDocumentUploadMessage = (ws: any, data: string) => {
+export const sendDocumentUploadMessage = (ws: any, data: any) => {
   const payload: any = {
     msgType: rtJsonSync.Message.MessageType.DOCUMENT_UPLOAD,
     doc: {data: JSON.stringify(data)}

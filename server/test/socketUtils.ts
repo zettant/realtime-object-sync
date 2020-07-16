@@ -17,7 +17,7 @@ export class WebSocketWithQueue extends WebSocket {
 
 export const wsSetup = (port: number): Promise<WebSocketWithQueue> => {
   return new Promise((resolve, reject) => {
-    const ws: any = new WebSocketWithQueue(`ws://localhost:${port}/`);
+    const ws: WebSocketWithQueue = new WebSocketWithQueue(`ws://localhost:${port}/`);
     ws.binaryType = 'arraybuffer';
     ws.onmessage = (msgEvent: any) => {
       ws.queue.push(parseMessage(msgEvent.data));

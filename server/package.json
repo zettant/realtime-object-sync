@@ -12,7 +12,7 @@
     "proto": "pbjs -t static-module -w commonjs -o src/proto/messages.js src/proto/messages.proto && pbjs -t static-module src/proto/messages.proto | pbts -o src/proto/messages.d.ts -",
     "build": "yarn proto && tsc -p .",
     "build:live": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/index.ts",
-    "test": "yarn proto && jest --clearCache && cross-env NODE_ENV=development jest --coverage",
+    "test": "yarn proto && cross-env NODE_ENV=test jest --coverage --no-cache --runInBand",
     "keypair": "openssl ecparam -genkey -name prime256v1 -out tmp-keypair.pem && openssl ec -in tmp-keypair.pem -outform PEM -pubout -out testPubkey.pem && openssl ec -in tmp-keypair.pem -outform PEM -out testSeckey.pem && rm -f tmp-keypair.pem"
   },
   "devDependencies": {
