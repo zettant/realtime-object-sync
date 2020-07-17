@@ -1,5 +1,5 @@
 import * as jwt from "jsonwebtoken";
-import {rtJsonSync} from "../src/proto/messages";
+import {rtObjSync} from "../src/proto/messages";
 const config = require('config');
 
 const invalidKey = '-----BEGIN EC PRIVATE KEY-----\nMHcCAQEEICjMCUCDbfNed1e+A16Y85JgPrv1aO6LTENS0rAXbVFRoAoGCCqGSM49\nAwEHoUQDQgAEpy96NUeU2WQVHckqpoe9JpbwJ4V9QSTZZRVndLPaEoBbaEC2ge8L\niet9qyZffF7/8r6U35u7OQ58OaMfl79dow==\n-----END EC PRIVATE KEY-----';
@@ -77,7 +77,7 @@ function toBuffer(ab: any) {
 
 export const parseMessage = (data: any): any => {
   const message = toBuffer(data);
-  return rtJsonSync.Message.decode(message);
+  return rtObjSync.Message.decode(message);
 }
 
 export const generateJwt = (payload: {[key: string]: string}) => {

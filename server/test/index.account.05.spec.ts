@@ -6,7 +6,7 @@ import {
   sendAccountUpdateMessage,
   sendDocumentUploadMessage
 } from "../src/syncMessage";
-import {rtJsonSync} from '../src/proto/messages';
+import {rtObjSync} from '../src/proto/messages';
 import * as http from 'http';
 import {serverInit} from '../src/index';
 import DoneCallback = jest.DoneCallback;
@@ -81,7 +81,7 @@ describe('server test (for account related features)', () => {
     //    -> test1 receives notification
     decoded = await sockets[0].getMessage();
     expect(decoded.accountNotify.sessionId).toBe('2');
-    expect(decoded.accountNotify.opType).toBe(rtJsonSync.Operation.ADD);
+    expect(decoded.accountNotify.opType).toBe(rtObjSync.Operation.ADD);
     const accountInfo = JSON.parse(decoded.accountNotify.accountInfo);
     expect(accountInfo.email).toBe('test2@example.com');
 

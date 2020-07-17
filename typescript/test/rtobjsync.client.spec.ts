@@ -22,7 +22,7 @@ const sleep = (ms: number) => {
   })
 }
 
-describe(`${envName}: rt-jsonsync-client`, async function () {
+describe(`${envName}: rt-objsync-client`, async function () {
 
   before(async function () {
     console.log("# NOTE: Please start realtime-object-sync server at localhost:8888");

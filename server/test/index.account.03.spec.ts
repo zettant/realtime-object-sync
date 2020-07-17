@@ -1,6 +1,6 @@
 import {WebSocketWithQueue, wsSetup, wsCloseAll, sleep, generateJwt} from './socketUtils';
 import {sendCloseMessage, sendOpenMessage, sendRequestMessage} from "../src/syncMessage";
-import {rtJsonSync} from '../src/proto/messages';
+import {rtObjSync} from '../src/proto/messages';
 import * as http from 'http';
 import {serverInit} from '../src/index';
 import DoneCallback = jest.DoneCallback;
@@ -55,7 +55,7 @@ describe('server test (for account related features)', () => {
     //    -> test1 receives notification
     decoded = await sockets[0].getMessage();
     expect(decoded.accountNotify.sessionId).toBe('2');
-    expect(decoded.accountNotify.opType).toBe(rtJsonSync.Operation.ADD);
+    expect(decoded.accountNotify.opType).toBe(rtObjSync.Operation.ADD);
     accountInfo = JSON.parse(decoded.accountNotify.accountInfo);
     expect(accountInfo.email).toBe('test2@example.com');
 
@@ -70,10 +70,10 @@ describe('server test (for account related features)', () => {
     //    -> test2 receives notification
     decoded = await sockets[1].getMessage();
     expect(decoded.accountNotify.sessionId).toBe('1');
-    expect(decoded.accountNotify.opType).toBe(rtJsonSync.Operation.DEL);
+    expect(decoded.accountNotify.opType).toBe(rtObjSync.Operation.DEL);
 
     // ---- test2 gets all accounts in testDoc1
-    sendRequestMessage(sockets[1], rtJsonSync.ReqType.ALL_ACCOUNT);
+    sendRequestMessage(sockets[1], rtObjSync.ReqType.ALL_ACCOUNT);
     decoded = await sockets[1].getMessage();
     expect(decoded.accountAll.documentName).toBe('testDoc1');
     accountInfo = JSON.parse(decoded.accountAll.allAccounts);

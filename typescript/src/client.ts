@@ -27,9 +27,11 @@ import {
   sendDocumentUploadMessage,
   sendOpenMessage,
   sendCloseMessage,
-  sendRequestMessage, sendAccountUpdateMessage, createDataUpdateMessage
+  sendRequestMessage,
+  sendAccountUpdateMessage,
+  createDataUpdateMessage
 } from "./syncMessage";
-import {rtJsonSync} from "./proto/messages";
+import {rtObjSync} from "./proto/messages";
 import {toBuffer} from './utils';
 
 
@@ -37,16 +39,21 @@ export class RealtimeSyncClient {
   private serverURL: string = '';
   public ws: WebSocket|null = null;
   private handler: any = {close: [], error: [], state: [], account: []};
-  private messageHandler: Map<rtJsonSync.Message.MessageType, (msg: rtJsonSync.Message)=>void>;
-  private allAccountGetHandler: ((msg: rtJsonSync.Message) => void)| null = null;
-  private messageQ: rtJsonSync.Message[] = [];
+  private messageHandler: Map<rtObjSync.Message.MessageType, (msg: rtObjSync.Message)=>void>;
+  private allAccountGetHandler: ((msg: rtObjSync.Message) => void)| null = null;
+  private messageQ: rtObjSync.Message[] = [];
   private isConnected = false;
+  private _sessionId = '';
   public document: DocumentObject|null = null;
   private _account: any = {};
   private state: any = {};
 
   constructor() {
-    this.messageHandler = new Map<rtJsonSync.Message.MessageType, (msg: rtJsonSync.Message)=>void>();
+    this.messageHandler = new Map<rtObjSync.Message.MessageType, (msg: rtObjSync.Message)=>void>();
+  }
+
+  get sessionId() {
+    return this._sessionId;
   }
 
   get account() {
@@ -64,8 +71,8 @@ export class RealtimeSyncClient {
     if (!this.ws) return;
     const message = createDataUpdateMessage({
       sessionId: '',
-      target: rtJsonSync.TargetType.STATE,
-      opType: rtJsonSync.Operation.ADD,
+      target: rtObjSync.TargetType.STATE,
+      opType: rtObjSync.Operation.ADD,
       revision: 0,
       targetKey: [key],
       data: value
@@ -78,8 +85,8 @@ export class RealtimeSyncClient {
     if (!this.ws) return;
     const message = createDataUpdateMessage({
       sessionId: '',
-      target: rtJsonSync.TargetType.STATE,
-      opType: rtJsonSync.Operation.DEL,
+      target: rtObjSync.TargetType.STATE,
+      opType: rtObjSync.Operation.DEL,
       revision: 0,
       targetKey: [key],
     });
@@ -97,8 +104,8 @@ export class RealtimeSyncClient {
   }
 
   onMessage = (message: MessageEvent) => {
-    const msgTypeEnum = rtJsonSync.Message.MessageType;
-    const msg = rtJsonSync.Message.decode(toBuffer(message.data));
+    const msgTypeEnum = rtObjSync.Message.MessageType;
+    const msg = rtObjSync.Message.decode(toBuffer(message.data));
     const func = this.messageHandler.get(msg.msgType);
     if (func) {
       func(msg);
@@ -119,7 +126,7 @@ export class RealtimeSyncClient {
       this.allAccountGetHandler(msg);
       return;
     }
-    if (msg.msgType === msgTypeEnum.DATA_UPDATE && msg.data && msg.data.target === rtJsonSync.TargetType.STATE && msg.data.sessionId) {
+    if (msg.msgType === msgTypeEnum.DATA_UPDATE && msg.data && msg.data.target === rtObjSync.TargetType.STATE && msg.data.sessionId) {
       const sessionId = msg.data.sessionId;
       // @ts-ignore
       const opType = ['ADD', 'DEL', 'MOV'][msg.data.opType];
@@ -164,11 +171,12 @@ export class RealtimeSyncClient {
     sendOpenMessage(this.ws, token, accountInfo);
 
     const response = await this.waitConnectedOrCloseMessage();
-    if (response.msgType === rtJsonSync.Message.MessageType.CLOSE) return this.isConnected;
+    if (response.msgType === rtObjSync.Message.MessageType.CLOSE) return this.isConnected;
     this.document = new DocumentObject(this, documentName);
 
-    if (response.connected && response.connected.hasInitialData) {
-      if (response.connected.data && response.connected.revision) {
+    if (response.connected && response.connected.sessionId) {
+      this._sessionId = response.connected.sessionId;
+      if (response.connected.hasInitialData && response.connected.data && response.connected.revision) {
         this.document.setDocument(response.connected.data, response.connected.revision);
       }
     }
@@ -185,8 +193,10 @@ export class RealtimeSyncClient {
   }
 
   public close = () => {
+    if (!this.ws) return;
     sendCloseMessage(this.ws, 0);
     this.isConnected = false;
+    this._sessionId = '';
   }
 
   public disconnect = () => {
@@ -196,14 +206,14 @@ export class RealtimeSyncClient {
   }
 
   public getAllAccounts = async (): Promise<any> => {
-    const p:Promise<rtJsonSync.Message> = new Promise((resolve) => {
-      this.allAccountGetHandler = (msg: rtJsonSync.Message) => {
-        if (msg.msgType !== rtJsonSync.Message.MessageType.ACCOUNT_ALL || !msg.accountAll || !msg.accountAll.allAccounts) return;
+    const p:Promise<rtObjSync.Message> = new Promise((resolve) => {
+      this.allAccountGetHandler = (msg: rtObjSync.Message) => {
+        if (msg.msgType !== rtObjSync.Message.MessageType.ACCOUNT_ALL || !msg.accountAll || !msg.accountAll.allAccounts) return;
         this.allAccountGetHandler = null;
         resolve(JSON.parse(msg.accountAll.allAccounts));
       }
     });
-    sendRequestMessage(this.ws, rtJsonSync.ReqType.ALL_ACCOUNT);
+    sendRequestMessage(this.ws, rtObjSync.ReqType.ALL_ACCOUNT);
     return p;
   }
 
@@ -217,19 +227,19 @@ export class RealtimeSyncClient {
     });
   }
 
-  private waitConnectedOrCloseMessage = (): Promise<rtJsonSync.Message> => {
+  private waitConnectedOrCloseMessage = (): Promise<rtObjSync.Message> => {
     return new Promise((resolve) => {
-      const func = (msg: rtJsonSync.Message) => {
-        this.messageHandler.delete(rtJsonSync.Message.MessageType.CONNECTED);
-        this.messageHandler.delete(rtJsonSync.Message.MessageType.CLOSE);
+      const func = (msg: rtObjSync.Message) => {
+        this.messageHandler.delete(rtObjSync.Message.MessageType.CONNECTED);
+        this.messageHandler.delete(rtObjSync.Message.MessageType.CLOSE);
         resolve(msg);
       }
-      this.messageHandler.set(rtJsonSync.Message.MessageType.CONNECTED, func);
-      this.messageHandler.set(rtJsonSync.Message.MessageType.CLOSE, func);
+      this.messageHandler.set(rtObjSync.Message.MessageType.CONNECTED, func);
+      this.messageHandler.set(rtObjSync.Message.MessageType.CLOSE, func);
     });
   }
 
-  private processMessageForDocument = (msg: rtJsonSync.Message) => {
+  private processMessageForDocument = (msg: rtObjSync.Message) => {
     console.log(msg);
   }
 

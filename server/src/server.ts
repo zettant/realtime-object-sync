@@ -24,7 +24,7 @@
 
 import * as jwt from 'jsonwebtoken';
 import {Logger} from './logger';
-import {rtJsonSync} from "./proto/messages";
+import {rtObjSync} from "./proto/messages";
 import {ExtWebSocket} from './extWebsock';
 import {SyncDocument} from './document';
 import {sendCloseMessage, IDataUpdate} from './syncMessage';
@@ -48,33 +48,33 @@ export class SyncServer {
   }
 
   dispatch = (ws: ExtWebSocket, message: any) => {
-    const decodedMessage: any = rtJsonSync.Message.decode(message);
+    const decodedMessage: any = rtObjSync.Message.decode(message);
     if (!decodedMessage) return;
     //console.log(decodedMessage);
 
     switch (decodedMessage.msgType) {
-      case rtJsonSync.Message.MessageType.OPEN:
+      case rtObjSync.Message.MessageType.OPEN:
         if (!this.verifyAndJoin(ws, decodedMessage.open.jwt, this.pubkeyPem, decodedMessage.open.accountInfo)) ws.close();
         break;
 
-      case rtJsonSync.Message.MessageType.CLOSE:
+      case rtObjSync.Message.MessageType.CLOSE:
         this.close(ws);
         break;
 
-      case rtJsonSync.Message.MessageType.REQUEST:
+      case rtObjSync.Message.MessageType.REQUEST:
         const reqType = decodedMessage.request.type;
-        if (reqType === rtJsonSync.ReqType.ALL_ACCOUNT) this.getAndSendAccounts(ws);
+        if (reqType === rtObjSync.ReqType.ALL_ACCOUNT) this.getAndSendAccounts(ws);
         break;
 
-      case rtJsonSync.Message.MessageType.ACCOUNT_UPDATE:
+      case rtObjSync.Message.MessageType.ACCOUNT_UPDATE:
         this.updateAccountInfo(ws, decodedMessage.accountUpdate.accountInfo)
         break;
         
-      case rtJsonSync.Message.MessageType.DOCUMENT_UPLOAD:
+      case rtObjSync.Message.MessageType.DOCUMENT_UPLOAD:
         this.setDocument(ws, decodedMessage.doc.data);
         break;
 
-      case rtJsonSync.Message.MessageType.DATA_UPDATE:
+      case rtObjSync.Message.MessageType.DATA_UPDATE:
         this.updateData(ws, decodedMessage.data)
         break;
     }
@@ -147,9 +147,9 @@ export class SyncServer {
     const doc = this.wsDocMap.get(ws);
     if (!doc) return;
 
-    if (info.target === rtJsonSync.TargetType.STATE) {
+    if (info.target === rtObjSync.TargetType.STATE) {
       this.documents[doc].updateState(ws, info);
-    } else if (info.target === rtJsonSync.TargetType.DOCUMENT) {
+    } else if (info.target === rtObjSync.TargetType.DOCUMENT) {
       this.documents[doc].updateDocument(ws, info);
     }
   }

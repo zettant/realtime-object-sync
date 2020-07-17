@@ -1,5 +1,5 @@
 syntax = "proto3";
-package rtJsonSync;
+package rtObjSync;
 
 enum Operation {
   ADD = 0;

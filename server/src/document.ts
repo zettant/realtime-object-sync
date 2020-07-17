@@ -24,7 +24,7 @@
 
 import {Logger} from './logger';
 import {ExtWebSocket} from './extWebsock';
-import {rtJsonSync} from "./proto/messages";
+import {rtObjSync} from "./proto/messages";
 import {
   createAccountNotifyMessage, createDataUpdateMessage,
   sendAccountAllMessage, sendConnectedMessage
@@ -59,7 +59,7 @@ export class SyncDocument {
     this.users.set(ws, sessionId);
     this.accounts[sessionId] = JSON.parse(accountInfo);
     this.states[sessionId] = {};
-    const message = createAccountNotifyMessage(sessionId, rtJsonSync.Operation.ADD, this.accounts[sessionId]);
+    const message = createAccountNotifyMessage(sessionId, rtObjSync.Operation.ADD, this.accounts[sessionId]);
     Logger.Debug(`add user: ${accountInfo} => sessionId: ${sessionId}`);
     this.broadcast(message, sessionId);
     sendConnectedMessage(ws, sessionId, this.document ? this.document: undefined, this.document ? this.document.revision : undefined);
@@ -71,7 +71,7 @@ export class SyncDocument {
     this.users.delete(ws);
     delete this.accounts[sessionId];
     delete this.states[sessionId];
-    const message = createAccountNotifyMessage(sessionId, rtJsonSync.Operation.DEL, null);
+    const message = createAccountNotifyMessage(sessionId, rtObjSync.Operation.DEL, null);
     Logger.Debug(`del user of sessionId: ${sessionId}`);
     this.broadcast(message);
   }
@@ -89,7 +89,7 @@ export class SyncDocument {
     const sessionId = this.users.get(ws);
     if (!sessionId) return;
     this.accounts[sessionId] = JSON.parse(accountInfo);
-    const message = createAccountNotifyMessage(sessionId, rtJsonSync.Operation.ADD, this.accounts[sessionId]);
+    const message = createAccountNotifyMessage(sessionId, rtObjSync.Operation.ADD, this.accounts[sessionId]);
     this.broadcast(message, sessionId);
   }
 
@@ -113,7 +113,7 @@ export class SyncDocument {
         target = target[keyArray[i]];
       }
       if (!target) return null;
-      if (info.opType === rtJsonSync.Operation.DEL) {
+      if (info.opType === rtObjSync.Operation.DEL) {
         // @ts-ignore
         delete target[lastKey];
       } else {

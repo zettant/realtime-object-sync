@@ -25,3 +25,4 @@
 import {RealtimeSyncClient} from "./client";
 
 export {RealtimeSyncClient};
+export default {RealtimeSyncClient};

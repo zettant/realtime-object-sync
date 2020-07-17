@@ -1,6 +1,6 @@
 import {WebSocketWithQueue, wsSetup, wsCloseAll, sleep, generateJwt, generateInvalidJwt} from './socketUtils';
 import {sendCloseMessage, sendOpenMessage, sendRequestMessage, createDataUpdateMessage} from "../src/syncMessage";
-import {rtJsonSync} from '../src/proto/messages';
+import {rtObjSync} from '../src/proto/messages';
 import * as http from 'http';
 import {serverInit} from '../src/index';
 import DoneCallback = jest.DoneCallback;
@@ -54,13 +54,13 @@ describe('server test (for state related features)', () => {
     //    -> test1 receives notification
     decoded = await sockets[0].getMessage();
     expect(decoded.accountNotify.sessionId).toBe('2');
-    expect(decoded.accountNotify.opType).toBe(rtJsonSync.Operation.ADD);
+    expect(decoded.accountNotify.opType).toBe(rtObjSync.Operation.ADD);
 
     // ---- test1 sends its initial state
     message = createDataUpdateMessage({
       sessionId: '',
-      target: rtJsonSync.TargetType.STATE,
-      opType: rtJsonSync.Operation.ADD,
+      target: rtObjSync.TargetType.STATE,
+      opType: rtObjSync.Operation.ADD,
       revision: 0,
       targetKey: [],
       data: {"pointer": [10, 20], "color": "blue", "hierarchy": {"x": [100, 3000], "y": 200}}
@@ -70,8 +70,8 @@ describe('server test (for state related features)', () => {
     //    -> test2 receives notification
     decoded = await sockets[1].getMessage();
     expect(decoded.data.sessionId).toBe('1');
-    expect(decoded.data.target).toBe(rtJsonSync.TargetType.STATE);
-    expect(decoded.data.opType).toBe(rtJsonSync.Operation.ADD);
+    expect(decoded.data.target).toBe(rtObjSync.TargetType.STATE);
+    expect(decoded.data.opType).toBe(rtObjSync.Operation.ADD);
     data = JSON.parse(decoded.data.data);
     expect(data.pointer[0]).toBe(10);
     expect(data.color).toBe('blue');
@@ -79,8 +79,8 @@ describe('server test (for state related features)', () => {
     // ---- test1 changes state
     message = createDataUpdateMessage({
       sessionId: '',
-      target: rtJsonSync.TargetType.STATE,
-      opType: rtJsonSync.Operation.ADD,
+      target: rtObjSync.TargetType.STATE,
+      opType: rtObjSync.Operation.ADD,
       revision: 0,
       targetKey: ["color"],
       data: "red"
@@ -90,8 +90,8 @@ describe('server test (for state related features)', () => {
     //    -> test2 receives notification
     decoded = await sockets[1].getMessage();
     expect(decoded.data.sessionId).toBe('1');
-    expect(decoded.data.target).toBe(rtJsonSync.TargetType.STATE);
-    expect(decoded.data.opType).toBe(rtJsonSync.Operation.ADD);
+    expect(decoded.data.target).toBe(rtObjSync.TargetType.STATE);
+    expect(decoded.data.opType).toBe(rtObjSync.Operation.ADD);
     data = JSON.parse(decoded.data.targetKey);
     expect(data[0]).toBe('color');
     data = JSON.parse(decoded.data.data);
@@ -100,8 +100,8 @@ describe('server test (for state related features)', () => {
     // ---- test1 changes state
     message = createDataUpdateMessage({
       sessionId: '',
-      target: rtJsonSync.TargetType.STATE,
-      opType: rtJsonSync.Operation.ADD,
+      target: rtObjSync.TargetType.STATE,
+      opType: rtObjSync.Operation.ADD,
       revision: 0,
       targetKey: ["hierarchy", "x"],
       data: [2, 5]
@@ -111,8 +111,8 @@ describe('server test (for state related features)', () => {
     //    -> test2 receives notification
     decoded = await sockets[1].getMessage();
     expect(decoded.data.sessionId).toBe('1');
-    expect(decoded.data.target).toBe(rtJsonSync.TargetType.STATE);
-    expect(decoded.data.opType).toBe(rtJsonSync.Operation.ADD);
+    expect(decoded.data.target).toBe(rtObjSync.TargetType.STATE);
+    expect(decoded.data.opType).toBe(rtObjSync.Operation.ADD);
     data = JSON.parse(decoded.data.targetKey);
     expect(data[0]).toBe('hierarchy');
     expect(data[1]).toBe('x');
@@ -123,8 +123,8 @@ describe('server test (for state related features)', () => {
     // ---- test1 changes state
     message = createDataUpdateMessage({
       sessionId: '',
-      target: rtJsonSync.TargetType.STATE,
-      opType: rtJsonSync.Operation.ADD,
+      target: rtObjSync.TargetType.STATE,
+      opType: rtObjSync.Operation.ADD,
       revision: 0,
       targetKey: ["hierarchy", "z"],
       data: {"z1": 100}
@@ -134,8 +134,8 @@ describe('server test (for state related features)', () => {
     //    -> test2 receives notification
     decoded = await sockets[1].getMessage();
     expect(decoded.data.sessionId).toBe('1');
-    expect(decoded.data.target).toBe(rtJsonSync.TargetType.STATE);
-    expect(decoded.data.opType).toBe(rtJsonSync.Operation.ADD);
+    expect(decoded.data.target).toBe(rtObjSync.TargetType.STATE);
+    expect(decoded.data.opType).toBe(rtObjSync.Operation.ADD);
     data = JSON.parse(decoded.data.targetKey);
     expect(data[0]).toBe('hierarchy');
     expect(data[1]).toBe('z');
@@ -146,8 +146,8 @@ describe('server test (for state related features)', () => {
     // ---- test1 changes state
     message = createDataUpdateMessage({
       sessionId: '',
-      target: rtJsonSync.TargetType.STATE,
-      opType: rtJsonSync.Operation.DEL,
+      target: rtObjSync.TargetType.STATE,
+      opType: rtObjSync.Operation.DEL,
       revision: 0,
       targetKey: ["hierarchy", "z"]
     });
@@ -156,8 +156,8 @@ describe('server test (for state related features)', () => {
     //    -> test2 receives notification
     decoded = await sockets[1].getMessage();
     expect(decoded.data.sessionId).toBe('1');
-    expect(decoded.data.target).toBe(rtJsonSync.TargetType.STATE);
-    expect(decoded.data.opType).toBe(rtJsonSync.Operation.DEL);
+    expect(decoded.data.target).toBe(rtObjSync.TargetType.STATE);
+    expect(decoded.data.opType).toBe(rtObjSync.Operation.DEL);
     data = JSON.parse(decoded.data.targetKey);
     expect(data[0]).toBe('hierarchy');
     expect(data[1]).toBe('z');

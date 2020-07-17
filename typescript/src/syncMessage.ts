@@ -22,7 +22,7 @@
  SOFTWARE.
  */
 
-import {rtJsonSync} from "./proto/messages";
+import {rtObjSync} from "./proto/messages";
 
 export interface IDataUpdate {
   sessionId: string,
@@ -35,8 +35,8 @@ export interface IDataUpdate {
 
 
 const createMessage = (payload: any) => {
-  const message = rtJsonSync.Message.create(payload);
-  return rtJsonSync.Message.encode(message).finish();
+  const message = rtObjSync.Message.create(payload);
+  return rtObjSync.Message.encode(message).finish();
 }
 
 export const sendMessage = (ws: any, payload: any) => {
@@ -45,7 +45,7 @@ export const sendMessage = (ws: any, payload: any) => {
 
 export const sendOpenMessage = (ws: any, token: string, accountInfo: any) => {
   const payload: any = {
-    msgType: rtJsonSync.Message.MessageType.OPEN,
+    msgType: rtObjSync.Message.MessageType.OPEN,
     open: {
       jwt: token,
       accountInfo: JSON.stringify(accountInfo)
@@ -57,7 +57,7 @@ export const sendOpenMessage = (ws: any, token: string, accountInfo: any) => {
 
 export const sendConnectedMessage = (ws: any, sessionId: string, data?: any, revision?: number) => {
   const payload: any = {
-    msgType: rtJsonSync.Message.MessageType.CONNECTED,
+    msgType: rtObjSync.Message.MessageType.CONNECTED,
     connected: {
       sessionId,
       hasInitialData: data != undefined,
@@ -73,7 +73,7 @@ export const sendConnectedMessage = (ws: any, sessionId: string, data?: any, rev
 
 export const sendCloseMessage = (ws: any, reason: number) => {
   const payload: any = {
-    msgType: rtJsonSync.Message.MessageType.CLOSE,
+    msgType: rtObjSync.Message.MessageType.CLOSE,
     close: { reason }
   }
   sendMessage(ws, payload);
@@ -82,7 +82,7 @@ export const sendCloseMessage = (ws: any, reason: number) => {
 
 export const sendRequestMessage = (ws: any, type: number) => {
   const payload: any = {
-    msgType: rtJsonSync.Message.MessageType.REQUEST,
+    msgType: rtObjSync.Message.MessageType.REQUEST,
     request: { type }
   }
   sendMessage(ws, payload);
@@ -91,7 +91,7 @@ export const sendRequestMessage = (ws: any, type: number) => {
 
 export const sendAccountAllMessage = (ws: any, documentName: string, allAccounts: any) => {
   const payload: any = {
-    msgType: rtJsonSync.Message.MessageType.ACCOUNT_ALL,
+    msgType: rtObjSync.Message.MessageType.ACCOUNT_ALL,
     accountAll: {documentName, allAccounts: JSON.stringify(allAccounts)}
   }
   sendMessage(ws, payload);
@@ -100,7 +100,7 @@ export const sendAccountAllMessage = (ws: any, documentName: string, allAccounts
 
 export const sendAccountUpdateMessage = (ws: any, accountInfo: any): any => {
   const payload: any = {
-    msgType: rtJsonSync.Message.MessageType.ACCOUNT_UPDATE,
+    msgType: rtObjSync.Message.MessageType.ACCOUNT_UPDATE,
     accountUpdate: {accountInfo: JSON.stringify(accountInfo)}
   };
   sendMessage(ws, payload);
@@ -109,7 +109,7 @@ export const sendAccountUpdateMessage = (ws: any, accountInfo: any): any => {
 
 export const createAccountNotifyMessage = (sessionId: string, opType: number, accountInfo: any) => {
   return createMessage({
-    msgType: rtJsonSync.Message.MessageType.ACCOUNT_NOTIFY,
+    msgType: rtObjSync.Message.MessageType.ACCOUNT_NOTIFY,
     accountNotify: {sessionId, opType, accountInfo: JSON.stringify(accountInfo)}
   });
 }
@@ -117,7 +117,7 @@ export const createAccountNotifyMessage = (sessionId: string, opType: number, ac
 
 export const sendDocumentUploadMessage = (ws: any, data: any) => {
   const payload: any = {
-    msgType: rtJsonSync.Message.MessageType.DOCUMENT_UPLOAD,
+    msgType: rtObjSync.Message.MessageType.DOCUMENT_UPLOAD,
     doc: {data: JSON.stringify(data)}
   }
   sendMessage(ws, payload);
@@ -127,7 +127,7 @@ export const sendDocumentUploadMessage = (ws: any, data: any) => {
 export const createDataUpdateMessage = (info: IDataUpdate) => {
   if (!info.data) info.data = null;
   return createMessage({
-    msgType: rtJsonSync.Message.MessageType.DATA_UPDATE,
+    msgType: rtObjSync.Message.MessageType.DATA_UPDATE,
     data: {
       sessionId: info.sessionId,
       target: info.target,

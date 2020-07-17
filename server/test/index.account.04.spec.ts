@@ -1,6 +1,6 @@
 import {WebSocketWithQueue, wsSetup, wsCloseAll, sleep, generateJwt} from './socketUtils';
 import {sendCloseMessage, sendOpenMessage, sendRequestMessage} from "../src/syncMessage";
-import {rtJsonSync} from '../src/proto/messages';
+import {rtObjSync} from '../src/proto/messages';
 import * as http from 'http';
 import {serverInit} from '../src/index';
 import DoneCallback = jest.DoneCallback;
@@ -59,7 +59,7 @@ describe('server test (for account related features)', () => {
     //    -> test2 receives notification
     decoded = await sockets[1].getMessage();
     expect(decoded.accountNotify.sessionId).toBe('1');
-    expect(decoded.accountNotify.opType).toBe(rtJsonSync.Operation.DEL);
+    expect(decoded.accountNotify.opType).toBe(rtObjSync.Operation.DEL);
 
     done();
   });
