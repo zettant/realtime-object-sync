@@ -56,7 +56,7 @@ describe('server test (for account related features)', () => {
     token = generateJwt({documentName: "testDoc1"});
 
     // ---- test1 creates a new doc "testDoc1"
-    sendOpenMessage(sockets[0], token, {email: 'test1@zettant.com', displayName: 'test1'});
+    sendOpenMessage(sockets[0], token, {email: 'test1@example.com', displayName: 'test1'});
     decoded = await sockets[0].getMessage();
     expect(decoded.connected.sessionId).toBe('1');
     expect(decoded.connected.hasInitialData).toBe(false);
@@ -67,7 +67,7 @@ describe('server test (for account related features)', () => {
 
 
     // ---- test2 joins testDoc2
-    sendOpenMessage(sockets[1], token, {email: 'test2@zettant.com', displayName: 'test2'});
+    sendOpenMessage(sockets[1], token, {email: 'test2@example.com', displayName: 'test2'});
     decoded = await sockets[1].getMessage();
     expect(decoded.connected.sessionId).toBe('2');
     expect(decoded.connected.hasInitialData).toBe(true);
@@ -83,7 +83,7 @@ describe('server test (for account related features)', () => {
     expect(decoded.accountNotify.sessionId).toBe('2');
     expect(decoded.accountNotify.opType).toBe(rtJsonSync.Operation.ADD);
     const accountInfo = JSON.parse(decoded.accountNotify.accountInfo);
-    expect(accountInfo.email).toBe('test2@zettant.com');
+    expect(accountInfo.email).toBe('test2@example.com');
 
     // ---- test2,3,4 close their sessions
     await sleep(1000);

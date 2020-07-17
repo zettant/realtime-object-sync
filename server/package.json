@@ -1,5 +1,5 @@
 {
-  "name": "rtJsonSyncServer",
+  "name": "rtObjectSyncServer",
   "version": "0.0.0",
   "description": "Server of JSON object synchronization",
   "main": "index.js",

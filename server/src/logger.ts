@@ -57,7 +57,6 @@ const defaultConfig = {
       "appenders": [
         "info"
         ,"console"
-        ,"stdout"
       ]
       ,"level": "INFO"
     },
@@ -65,7 +64,6 @@ const defaultConfig = {
       "appenders": [
         "debug"
         ,"console"
-        ,"stdout"
       ]
       ,"level": "DEBUG"
     },
@@ -73,7 +71,6 @@ const defaultConfig = {
       "appenders": [
         "info"
         ,"console"
-        ,"stdout"
       ]
       ,"level": "INFO"
     },
@@ -81,7 +78,6 @@ const defaultConfig = {
       "appenders": [
         "warning"
         ,"console"
-        ,"stdout"
       ]
       ,"level": "WARN"
     },
@@ -89,7 +85,6 @@ const defaultConfig = {
       "appenders": [
         "error"
         ,"console"
-        ,"stdout"
       ]
       ,"level": "ERROR"
     }

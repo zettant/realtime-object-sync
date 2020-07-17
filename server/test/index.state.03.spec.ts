@@ -40,13 +40,13 @@ describe('server test (for state related features)', () => {
 
     // ---- test1 creates a new doc
     const token = generateJwt({documentName: "testDoc1"});
-    sendOpenMessage(sockets[0], token, {email: 'test@zettant.com', displayName: 'test1'});
+    sendOpenMessage(sockets[0], token, {email: 'test@example.com', displayName: 'test1'});
     decoded = await sockets[0].getMessage();
     expect(decoded.connected.sessionId).toBe('1');
     expect(decoded.connected.hasInitialData).toBe(false);
 
     // ---- test2 joins testDoc2
-    sendOpenMessage(sockets[1], token, {email: 'test2@zettant.com', displayName: 'test2'});
+    sendOpenMessage(sockets[1], token, {email: 'test2@example.com', displayName: 'test2'});
     decoded = await sockets[1].getMessage();
     expect(decoded.connected.sessionId).toBe('2');
     expect(decoded.connected.hasInitialData).toBe(false);

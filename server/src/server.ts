@@ -27,17 +27,8 @@ import {Logger} from './logger';
 import {rtJsonSync} from "./proto/messages";
 import {ExtWebSocket} from './extWebsock';
 import {SyncDocument} from './document';
-import {sendCloseMessage} from './syncMessage';
+import {sendCloseMessage, IDataUpdate} from './syncMessage';
 
-
-export interface IDataUpdate {
-  sessionId: string,
-  target: number,
-  opType: number,
-  revision: number,
-  targetKey: any,
-  data?: any
-}
 
 export class SyncServer {
   private documents: {[key: string]: SyncDocument} = {};

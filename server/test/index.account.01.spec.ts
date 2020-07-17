@@ -36,7 +36,7 @@ describe('server test (for account related features)', () => {
 
     // ---- test1 creates a new doc
     const token = generateJwt({documentName: "testDoc1"});
-    sendOpenMessage(sockets[0], token, {email: 'test@zettant.com', displayName: 'test1'});
+    sendOpenMessage(sockets[0], token, {email: 'test@example.com', displayName: 'test1'});
     const decoded = await sockets[0].getMessage();
     expect(decoded.connected.sessionId).toBe('1');
     expect(decoded.connected.hasInitialData).toBe(false);
@@ -54,7 +54,7 @@ describe('server test (for account related features)', () => {
 
     // ---- test1 creates a new doc with invalid token
     const token = generateInvalidJwt({documentName: "testDoc1"});
-    sendOpenMessage(sockets[0], token, {email: 'test@zettant.com', displayName: 'test1'});
+    sendOpenMessage(sockets[0], token, {email: 'test@example.com', displayName: 'test1'});
     const decoded = await sockets[0].getMessage();
     expect(decoded.close.reason).toBe(1);
 
@@ -74,13 +74,13 @@ describe('server test (for account related features)', () => {
     token = generateJwt({documentName: "testDoc2"});
 
     // ---- test1 creates a new doc "testDoc2"
-    sendOpenMessage(sockets[0], token, {email: 'test1@zettant.com', displayName: 'test1'});
+    sendOpenMessage(sockets[0], token, {email: 'test1@example.com', displayName: 'test1'});
     decoded = await sockets[0].getMessage();
     expect(decoded.connected.sessionId).toBe('2');
     expect(decoded.connected.hasInitialData).toBe(false);
 
     // ---- test2 joins testDoc2
-    sendOpenMessage(sockets[1], token, {email: 'test2@zettant.com', displayName: 'test2'});
+    sendOpenMessage(sockets[1], token, {email: 'test2@example.com', displayName: 'test2'});
     decoded = await sockets[1].getMessage();
     expect(decoded.connected.sessionId).toBe('3');
     expect(decoded.connected.hasInitialData).toBe(false);
@@ -90,10 +90,10 @@ describe('server test (for account related features)', () => {
     expect(decoded.accountNotify.sessionId).toBe('3');
     expect(decoded.accountNotify.opType).toBe(rtJsonSync.Operation.ADD);
     accountInfo = JSON.parse(decoded.accountNotify.accountInfo);
-    expect(accountInfo.email).toBe('test2@zettant.com');
+    expect(accountInfo.email).toBe('test2@example.com');
 
     // ---- test3 joins testDoc2
-    sendOpenMessage(sockets[2], token, {email: 'test3@zettant.com', displayName: 'test3'});
+    sendOpenMessage(sockets[2], token, {email: 'test3@example.com', displayName: 'test3'});
     decoded = await sockets[2].getMessage();
     expect(decoded.connected.sessionId).toBe('4');
     expect(decoded.connected.hasInitialData).toBe(false);
@@ -103,17 +103,17 @@ describe('server test (for account related features)', () => {
     expect(decoded.accountNotify.sessionId).toBe('4');
     expect(decoded.accountNotify.opType).toBe(rtJsonSync.Operation.ADD);
     accountInfo = JSON.parse(decoded.accountNotify.accountInfo);
-    expect(accountInfo.email).toBe('test3@zettant.com');
+    expect(accountInfo.email).toBe('test3@example.com');
 
     //    -> test2 receives notification
     decoded = await sockets[1].getMessage();
     expect(decoded.accountNotify.sessionId).toBe('4');
     expect(decoded.accountNotify.opType).toBe(rtJsonSync.Operation.ADD);
     accountInfo = JSON.parse(decoded.accountNotify.accountInfo);
-    expect(accountInfo.email).toBe('test3@zettant.com');
+    expect(accountInfo.email).toBe('test3@example.com');
 
     // ---- test4 joins testDoc2
-    sendOpenMessage(sockets[3], token, {email: 'test4@zettant.com', displayName: 'test4'});
+    sendOpenMessage(sockets[3], token, {email: 'test4@example.com', displayName: 'test4'});
     decoded = await sockets[3].getMessage();
     expect(decoded.connected.sessionId).toBe('5');
     expect(decoded.connected.hasInitialData).toBe(false);
@@ -123,21 +123,21 @@ describe('server test (for account related features)', () => {
     expect(decoded.accountNotify.sessionId).toBe('5');
     expect(decoded.accountNotify.opType).toBe(rtJsonSync.Operation.ADD);
     accountInfo = JSON.parse(decoded.accountNotify.accountInfo);
-    expect(accountInfo.email).toBe('test4@zettant.com');
+    expect(accountInfo.email).toBe('test4@example.com');
 
     //    -> test2 receives notification
     decoded = await sockets[1].getMessage();
     expect(decoded.accountNotify.sessionId).toBe('5');
     expect(decoded.accountNotify.opType).toBe(rtJsonSync.Operation.ADD);
     accountInfo = JSON.parse(decoded.accountNotify.accountInfo);
-    expect(accountInfo.email).toBe('test4@zettant.com');
+    expect(accountInfo.email).toBe('test4@example.com');
 
     //    -> test3 receives notification
     decoded = await sockets[2].getMessage();
     expect(decoded.accountNotify.sessionId).toBe('5');
     expect(decoded.accountNotify.opType).toBe(rtJsonSync.Operation.ADD);
     accountInfo = JSON.parse(decoded.accountNotify.accountInfo);
-    expect(accountInfo.email).toBe('test4@zettant.com');
+    expect(accountInfo.email).toBe('test4@example.com');
 
     // ---- test4 gets all accounts who are editing testDoc2
     sendRequestMessage(sockets[3], rtJsonSync.ReqType.ALL_ACCOUNT);
@@ -166,19 +166,19 @@ describe('server test (for account related features)', () => {
     expect(decoded.accountNotify.opType).toBe(rtJsonSync.Operation.DEL);
 
     // ---- test2 changes its account information
-    sendAccountUpdateMessage(sockets[1], {email: 'test2@zettant.com', displayName: 'test2-2'});
+    sendAccountUpdateMessage(sockets[1], {email: 'test2@example.com', displayName: 'test2-2'});
 
     //    -> test3 receives notification
     decoded = await sockets[2].getMessage();
     expect(decoded.accountNotify.sessionId).toBe('3');
-    expect(decoded.accountNotify.opType).toBe(rtJsonSync.Operation.MOD);
+    expect(decoded.accountNotify.opType).toBe(rtJsonSync.Operation.ADD);
     accountInfo = JSON.parse(decoded.accountNotify.accountInfo);
     expect(accountInfo.displayName).toBe('test2-2');
 
     //    -> test4 receives notification
     decoded = await sockets[3].getMessage();
     expect(decoded.accountNotify.sessionId).toBe('3');
-    expect(decoded.accountNotify.opType).toBe(rtJsonSync.Operation.MOD);
+    expect(decoded.accountNotify.opType).toBe(rtJsonSync.Operation.ADD);
     accountInfo = JSON.parse(decoded.accountNotify.accountInfo);
     expect(accountInfo.displayName).toBe('test2-2');
 

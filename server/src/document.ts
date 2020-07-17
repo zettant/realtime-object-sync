@@ -29,7 +29,8 @@ import {
   createAccountNotifyMessage, createDataUpdateMessage,
   sendAccountAllMessage, sendConnectedMessage
 } from "./syncMessage";
-import {IDataUpdate} from './server';
+import {IDataUpdate} from './syncMessage';
+
 
 export class SyncDocument {
   private readonly documentName: string;
@@ -48,7 +49,9 @@ export class SyncDocument {
   broadcast = (message: any, exclude?: string) => {
     this.users.forEach((sessionId: string, ws: ExtWebSocket) => {
       if (sessionId === exclude) return;
-      ws.send(message);
+      try {
+        ws.send(message);
+      } catch {}
     });
   }
 
@@ -59,7 +62,7 @@ export class SyncDocument {
     const message = createAccountNotifyMessage(sessionId, rtJsonSync.Operation.ADD, this.accounts[sessionId]);
     Logger.Debug(`add user: ${accountInfo} => sessionId: ${sessionId}`);
     this.broadcast(message, sessionId);
-    sendConnectedMessage(ws, sessionId, this.document ? this.document: undefined);
+    sendConnectedMessage(ws, sessionId, this.document ? this.document: undefined, this.document ? this.document.revision : undefined);
   }
 
   delUser = (ws: ExtWebSocket) => {
@@ -74,6 +77,7 @@ export class SyncDocument {
   }
 
   setDocument = (data: string) => {
+    // TODO: 初期データをセットするタイミングとセット前に他の人が編集してしまった場合の対処
     this.document = JSON.parse(data);
   }
 
@@ -85,8 +89,7 @@ export class SyncDocument {
     const sessionId = this.users.get(ws);
     if (!sessionId) return;
     this.accounts[sessionId] = JSON.parse(accountInfo);
-    const message = createAccountNotifyMessage(sessionId, rtJsonSync.Operation.MOD, this.accounts[sessionId]);
-    console.log(this.accounts[sessionId])
+    const message = createAccountNotifyMessage(sessionId, rtJsonSync.Operation.ADD, this.accounts[sessionId]);
     this.broadcast(message, sessionId);
   }
 
@@ -130,7 +133,6 @@ export class SyncDocument {
     if (!infoToNotify) return;
 
     this.broadcast(createDataUpdateMessage(infoToNotify), sessionId);
-    console.log(this.states);
   }
 
   updateDocument = (ws: ExtWebSocket, info: IDataUpdate) => {
