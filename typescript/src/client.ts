@@ -47,6 +47,7 @@ export class RealtimeSyncClient {
   public document: DocumentObject|null = null;
   private _account: any = {};
   private state: any = {};
+  private downloadedDocumentData: any = null;
 
   constructor() {
     this.messageHandler = new Map<rtObjSync.Message.MessageType, (msg: rtObjSync.Message)=>void>();
@@ -126,15 +127,18 @@ export class RealtimeSyncClient {
       this.allAccountGetHandler(msg);
       return;
     }
-    if (msg.msgType === msgTypeEnum.DATA_UPDATE && msg.data && msg.data.target === rtObjSync.TargetType.STATE && msg.data.sessionId) {
-      const sessionId = msg.data.sessionId;
-      // @ts-ignore
-      const opType = ['ADD', 'DEL', 'MOV'][msg.data.opType];
-      const key: string|null = !msg.data.targetKey ? null : msg.data.targetKey;
-      const data = msg.data.data;
+
+    if (msg.msgType !== msgTypeEnum.DATA_UPDATE || !msg.data || !msg.data.sessionId || msg.data.opType == undefined) return;
+
+    const sessionId = msg.data.sessionId;
+    const opType = ['ADD', 'DEL', 'MOV'][msg.data.opType];
+    const keys: string[] = msg.data.targetKey ? JSON.parse(msg.data.targetKey) : [];
+    const data = msg.data.data ? JSON.parse(msg.data.data) : null;
+
+    if (msg.data.target === rtObjSync.TargetType.STATE) {
       this.handler.state.forEach(
-        (f: (sessionId: string, opType: string, key: string|null, data: any) => void) => {
-          f(sessionId, opType, key, data ? JSON.parse(data) : null)
+        (f: (sessionId: string, opType: string, keys: string[], data: any) => void) => {
+          f(sessionId, opType, keys, data)
         });
       return;
     }
@@ -143,7 +147,7 @@ export class RealtimeSyncClient {
       this.messageQ.push(msg);
       return;
     }
-    this.processMessageForDocument(msg);
+    this.processMessageForDocument(sessionId, opType, keys, data);
   }
 
   public addListener = (target: string, func: Function) => {
@@ -159,7 +163,7 @@ export class RealtimeSyncClient {
     this.handler[target] = array.filter((f: Function) => f != func);
   }
 
-  public open = async (serverURL: string, token: string, accountInfo: any, documentName: string, initialData?: any): Promise<boolean> => {
+  public open = async (serverURL: string, token: string, accountInfo: any, initialData?: any): Promise<boolean> => {
     this.serverURL = serverURL;
     this.ws = new WebSocket(this.serverURL);
     this.ws.binaryType = 'arraybuffer';
@@ -172,17 +176,14 @@ export class RealtimeSyncClient {
 
     const response = await this.waitConnectedOrCloseMessage();
     if (response.msgType === rtObjSync.Message.MessageType.CLOSE) return this.isConnected;
-    this.document = new DocumentObject(this, documentName);
+    this.document = new DocumentObject(this);
 
     if (response.connected && response.connected.sessionId) {
       this._sessionId = response.connected.sessionId;
-      if (response.connected.hasInitialData && response.connected.data && response.connected.revision) {
-        this.document.setDocument(response.connected.data, response.connected.revision);
+      if (response.connected.hasInitialData && response.connected.data && response.connected.revision != undefined) {
+        this.downloadedDocumentData = response.connected.data;
       }
-    }
-    else {
-      if (initialData) {
-        this.document.setDocument(JSON.stringify(initialData), 0);
+      else if (initialData) {
         sendDocumentUploadMessage(this.ws, initialData);
       }
     }
@@ -217,6 +218,12 @@ export class RealtimeSyncClient {
     return p;
   }
 
+  public getDownloadedDocument = () => {
+    const ret = this.downloadedDocumentData;
+    this.downloadedDocumentData = null;
+    return JSON.parse(ret);
+  }
+
   private waitSocketOpen = (): Promise<boolean> => {
     return new Promise((resolve, reject) => {
       if (!this.ws) {
@@ -239,16 +246,7 @@ export class RealtimeSyncClient {
     });
   }
 
-  private processMessageForDocument = (msg: rtObjSync.Message) => {
-    console.log(msg);
+  processMessageForDocument = (sessionId: string, opType: string, keys: string[], data: any) => { // should be overridden
+    console.log(`sessionId=${sessionId}, opType=${opType}, keys=${keys}, data=${data}`);
   }
-
-  // private accountUpdated = (before: any, after: any) => {
-  //   console.log(">>account:", before, after);
-  // }
-  //
-  // private stateUpdated = (before: any, after: any) => {
-  //   console.log(">>state:", before, after);
-  // }
-
 }

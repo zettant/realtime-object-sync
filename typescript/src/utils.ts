@@ -22,6 +22,10 @@
  SOFTWARE.
  */
 
+/**
+ * convert array buffer to buffer
+ * @param arraybuffer
+ */
 export const toBuffer = (arraybuffer: any) => {
   const buf = Buffer.alloc(arraybuffer.byteLength);
   const view = new Uint8Array(arraybuffer);
@@ -29,4 +33,34 @@ export const toBuffer = (arraybuffer: any) => {
     buf[i] = view[i];
   }
   return buf;
+}
+
+/**
+ * Apply document node element info to target object
+ * @param target
+ * @param opType
+ * @param keys
+ * @param value
+ */
+export const convertDocumentNodeElement = (target: any, opType: string, keys: string[], value: any) => {
+  if (keys.length === 0) return;
+  // @ts-ignore
+  const lastKey: string = keys.pop();
+
+  for (let i = 0; i < keys.length; i++) {
+    if (!target || !target.hasOwnProperty(keys[i])) {
+      target = null;
+      break;
+    }
+    target = target[keys[i]];
+  }
+  if (!target) return;
+
+  if (opType === 'DEL') {
+    if (!target[lastKey]) return;
+    delete target[lastKey];
+  }
+  else {
+    target[lastKey] = value;
+  }
 }

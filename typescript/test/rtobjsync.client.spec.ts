@@ -11,8 +11,6 @@ const envName = env.envName;
 
 const serverURL = 'ws://localhost:8888';
 const token = 'eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJkb2N1bWVudE5hbWUiOiJ0ZXN0RG9jMSIsImlhdCI6MTU5NDk1MTkwOCwiZXhwIjoxNTk3NTQzOTA4LCJhdWQiOiJTeW5jU2VydmVyIn0.xRk9rlgxlI4OkylNKkheUfKZ_DmiKC8fEBm_iZhnI3Tgvj6WPXyVPD40WZB0vvkjADmikZCwjO-T4QgPMpZ9-Q';
-const documentName = "testDocument1";
-
 
 const sleep = (ms: number) => {
   return new Promise( (resolve) => {
@@ -31,7 +29,7 @@ describe(`${envName}: rt-objsync-client`, async function () {
 
   it('single user connects with server and disconnects', async function () {
     const rtClient: RealtimeSyncClient = new clientlib.RealtimeSyncClient();
-    await rtClient.open(serverURL, token, {email: 'test@example.com'}, documentName);
+    await rtClient.open(serverURL, token, {email: 'test@example.com'});
 
     rtClient.close();
     rtClient.disconnect();
@@ -43,10 +41,10 @@ describe(`${envName}: rt-objsync-client`, async function () {
     rtClients.push(new clientlib.RealtimeSyncClient());
 
     // ---- test1 joins document edit
-    await rtClients[0].open(serverURL, token, {email: 'test1@example.com'}, documentName);
+    await rtClients[0].open(serverURL, token, {email: 'test1@example.com'});
 
     // ---- test2 joins document edit
-    await rtClients[1].open(serverURL, token, {email: 'test2@example.com'}, documentName);
+    await rtClients[1].open(serverURL, token, {email: 'test2@example.com'});
 
     // ---- test2 gets all accounts
     const allAccounts = await rtClients[1].getAllAccounts();
@@ -66,8 +64,8 @@ describe(`${envName}: rt-objsync-client`, async function () {
     rtClients.push(new clientlib.RealtimeSyncClient());
 
     // ---- test1 and test2 join document edit
-    await rtClients[0].open(serverURL, token, {email: 'test1@example.com'}, documentName);
-    await rtClients[1].open(serverURL, token, {email: 'test2@example.com'}, documentName);
+    await rtClients[0].open(serverURL, token, {email: 'test1@example.com'});
+    await rtClients[1].open(serverURL, token, {email: 'test2@example.com'});
 
     // ---- test1 changes its account info and test2 receives notification
     const funcAccount = (sessionId: string|null, opType: string, info: any) => {
@@ -80,11 +78,10 @@ describe(`${envName}: rt-objsync-client`, async function () {
     rtClients[1].account = {email: 'test2-1@example.com', displayName: 'test2-1'};
 
     // ---- test2 changes its state info and test1 receives notification
-    const funcState = (sessionId: string, opType: string, key: string|null, data: any) => {
-      console.log("state >>>", sessionId, opType, key, data);
-      const keyArray = key ? JSON.parse(key) : [];
-      expect(keyArray.length).equals(1);
-      expect(keyArray[0]).equals('item1');
+    const funcState = (sessionId: string, opType: string, keys: any, data: any) => {
+      console.log("state >>>", sessionId, opType, keys, data);
+      expect(keys.length).equals(1);
+      expect(keys[0]).equals('item1');
       if (opType === 'ADD') {
         expect(data.x).equals(10);
         expect(data.y).equals(20);

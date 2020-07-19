@@ -22,6 +22,7 @@
  SOFTWARE.
  */
 
+import * as AsyncLock from 'async-lock';
 import {Logger} from './logger';
 import {ExtWebSocket} from './extWebsock';
 import {rtObjSync} from "./proto/messages";
@@ -35,7 +36,8 @@ import {IDataUpdate} from './syncMessage';
 export class SyncDocument {
   private readonly documentName: string;
   private users: Map<ExtWebSocket, string>;
-  private document: any = null;
+  private revision = 0;
+  private document: any = {};
   private accounts: any = {};
   private states: any = {};
 
@@ -62,7 +64,10 @@ export class SyncDocument {
     const message = createAccountNotifyMessage(sessionId, rtObjSync.Operation.ADD, this.accounts[sessionId]);
     Logger.Debug(`add user: ${accountInfo} => sessionId: ${sessionId}`);
     this.broadcast(message, sessionId);
-    sendConnectedMessage(ws, sessionId, this.document ? this.document: undefined, this.document ? this.document.revision : undefined);
+    sendConnectedMessage(ws,
+      sessionId,
+      Object.keys(this.document).length > 0 ? this.document: undefined,
+      this.document ? this.document.revision : undefined);
   }
 
   delUser = (ws: ExtWebSocket) => {
@@ -77,6 +82,7 @@ export class SyncDocument {
   }
 
   setDocument = (data: string) => {
+    if (Object.keys(this.document).length > 0) return; // すでに登録済みなら、更に上書きはしない
     // TODO: 初期データをセットするタイミングとセット前に他の人が編集してしまった場合の対処
     this.document = JSON.parse(data);
   }
@@ -94,48 +100,67 @@ export class SyncDocument {
   }
 
 
-  updateData = (target: any, sessionId: string, info: IDataUpdate): IDataUpdate|null => {
-    info.data = JSON.parse(info.data);
-    const keyArray: any = JSON.parse(info.targetKey);
-    if (!keyArray) return null;
+  updateData = (target: any, keyArray: string[], info: IDataUpdate): boolean => {
+    const lastKey: string | undefined = keyArray.pop();
+    if (!lastKey) return false;
 
-    if (keyArray.length === 0) {
-      target[sessionId] = info.data;
-    }
-    else {
-      target = target[sessionId];
-      const lastKey: string = keyArray.pop();
-      for (let i = 0; i < keyArray.length; i++) {
-        if (!target || !target.hasOwnProperty(keyArray[i])) {
-          target = null;
-          break;
-        }
-        target = target[keyArray[i]];
+    for (let i = 0; i < keyArray.length; i++) {
+      if (!target || !target.hasOwnProperty(keyArray[i])) {
+        target = null;
+        break;
       }
-      if (!target) return null;
-      if (info.opType === rtObjSync.Operation.DEL) {
-        // @ts-ignore
-        delete target[lastKey];
-      } else {
-        target[lastKey] = info.data;
-      }
-      keyArray.push(lastKey)
+      target = target[keyArray[i]];
     }
-
-    return {sessionId, target: info.target, opType: info.opType, revision: info.revision, targetKey: keyArray, data: info.data};
+    if (!target) return false;
+    if (info.opType === rtObjSync.Operation.DEL) {
+      if (!target[lastKey]) return false;
+      delete target[lastKey];
+    } else {
+      target[lastKey] = info.data;
+    }
+    keyArray.push(lastKey)
+    return true;
   }
 
   updateState = (ws: ExtWebSocket, info: IDataUpdate) => {
     const sessionId = this.users.get(ws);
     if (!sessionId) return;
 
-    const infoToNotify: IDataUpdate|null = this.updateData(this.states, sessionId, info);
-    if (!infoToNotify) return;
+    info.data = JSON.parse(info.data);
+    const keyArray: any = JSON.parse(info.targetKey);
+    if (!keyArray) return null;
 
-    this.broadcast(createDataUpdateMessage(infoToNotify), sessionId);
+    if (keyArray.length === 0) {
+      this.states[sessionId] = info.data;
+    }
+    else {
+      if (!this.updateData(this.states[sessionId], keyArray, info)) return null;
+    }
+    this.broadcast(createDataUpdateMessage(
+      {sessionId, target: info.target, opType: info.opType,
+        revision: info.revision, targetKey: keyArray, data: info.data}
+        ), sessionId);
   }
 
-  updateDocument = (ws: ExtWebSocket, info: IDataUpdate) => {
+  updateDocument = async (ws: ExtWebSocket, info: IDataUpdate) => {
+    const sessionId = this.users.get(ws);
+    if (!sessionId) return;
 
+    const lock = new AsyncLock();
+    await lock.acquire(this.documentName, () => {
+
+      info.data = JSON.parse(info.data);
+      const keyArray: any = JSON.parse(info.targetKey);
+      if (!keyArray) return;
+
+      if (!this.updateData(this.document, keyArray, info)) return;
+      this.revision += 1;
+      this.broadcast(createDataUpdateMessage(
+        {sessionId, target: info.target, opType: info.opType,
+          revision: this.revision, targetKey: keyArray, data: info.data}
+      ), sessionId);
+      // console.log(">>>revision:", this.revision);
+      // console.log(JSON.stringify(this.document));
+    });
   }
 }

@@ -22,7 +22,9 @@
  SOFTWARE.
  */
 
-import {RealtimeSyncClient} from "./client";
+import {RealtimeSyncClient} from './client';
+import {IDocumentNode} from './document';
+import {convertDocumentNodeElement} from './utils';
 
-export {RealtimeSyncClient};
+export {RealtimeSyncClient, IDocumentNode, convertDocumentNodeElement};
 export default {RealtimeSyncClient};
