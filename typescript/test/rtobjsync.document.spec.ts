@@ -57,32 +57,31 @@ describe(`${envName}: rt-objsync-client document modification`, async function (
   });
 
   it('just set initial data in document', async function () {
+    const doc = Object.assign({}, initialDocument);
     const rtClient: RealtimeSyncClient = new clientlib.RealtimeSyncClient();
-    await rtClient.open(serverURL, token, {email: 'test@example.com'}, initialDocument);
+    await rtClient.open(serverURL, token, {email: 'test@example.com'}, doc);
     expect(rtClient).not.null;
     expect(rtClient.document).not.null;
     if (!rtClient.document) return;
 
-    rtClient.document.setAutoNodeCreation('a1', -1);
-    rtClient.document.setAutoNodeCreation('b1', 3)
-    rtClient.document.setDocument(initialDocument, true);
+    rtClient.document.setDocument(doc);
+    rtClient.document.makeTopNodeInDocument('a1', -1, true);
+    rtClient.document.makeTopNodeInDocument('b1', 3, true)
 
     // @ts-ignore
-    console.log(rtClient.document.dump());
+    console.log(JSON.stringify(rtClient.document.getDocument()));
 
     // @ts-ignore
     let node = rtClient.document.getNodeAt(['a1', 'a2-2']);
-    expect(node.value).equals('a22string');
+    expect(node).equals('a22string');
 
     // @ts-ignore
     node = rtClient.document.getNodeAt(['b1', 'b2-2']);
-    expect(node.value['b3-1']).equals(200);
-    console.log(node.value);
+    expect(node['b3-1']).equals(200);
 
     // @ts-ignore
     node = rtClient.document.getNodeAt(['b1', 'b2-3', 'b3-1']);
-    expect(node.value['b3-1-1']['b3-1-1-1']['b3-1-1-1-1']).equals('XXXX');
-    console.log(node.value);
+    expect(node['b3-1-1']['b3-1-1-1']['b3-1-1-1-1']).equals('XXXX');
 
     rtClient.close();
     rtClient.disconnect();
@@ -105,13 +104,13 @@ describe(`${envName}: rt-objsync-client document modification`, async function (
 
     if (!rtClients[0].document || !rtClients[1].document) return;
 
-    rtClients[0].document.setAutoNodeCreation('a1', -1);
-    rtClients[0].document.setAutoNodeCreation('b1', 3)
-    rtClients[0].document.setDocument(doc1, true);
+    rtClients[0].document.setDocument(doc1);
+    rtClients[0].document.makeTopNodeInDocument('a1', -1, true);
+    rtClients[0].document.makeTopNodeInDocument('b1', 3, true);
 
-    rtClients[1].document.setAutoNodeCreation('a1', -1);
-    rtClients[1].document.setAutoNodeCreation('b1', 3)
-    rtClients[1].document.setDocument(doc2, true);
+    rtClients[1].document.setDocument(doc2);
+    rtClients[1].document.makeTopNodeInDocument('a1', -1, true);
+    rtClients[1].document.makeTopNodeInDocument('b1', 3, true);
 
 
     // ---- test1 changes document and test2 receives notification
@@ -126,7 +125,8 @@ describe(`${envName}: rt-objsync-client document modification`, async function (
 
     const nodeA1 = rtClients[0].document.getNodeAt(['a1']);
     rtClients[0].document.addChildNode(nodeA1, 'a2-3', {'a3-3-1': 200});
-    rtClients[0].document.addLevel1( 'c1', {'c2': 'YYYY'});
+    rtClients[0].document.addTopNode( 'c1', {'c2': 'YYYY'});
+    console.log("DUMP: ", rtClients[0].document.dumpNode());
 
     const nodeB1 = rtClients[0].document.getNodeAt(['b1', 'b2-3']);
     rtClients[0].document.removeChild(nodeB1, 'b3-1');

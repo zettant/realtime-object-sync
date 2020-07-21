@@ -32,7 +32,7 @@ import {
   createDataUpdateMessage
 } from "./syncMessage";
 import {rtObjSync} from "./proto/messages";
-import {toBuffer} from './utils';
+import {toBuffer, replacer} from './utils';
 
 
 export class RealtimeSyncClient {
@@ -184,7 +184,7 @@ export class RealtimeSyncClient {
         this.downloadedDocumentData = response.connected.data;
       }
       else if (initialData) {
-        sendDocumentUploadMessage(this.ws, initialData);
+        sendDocumentUploadMessage(this.ws, JSON.parse(JSON.stringify(initialData, replacer)));
       }
     }
 
