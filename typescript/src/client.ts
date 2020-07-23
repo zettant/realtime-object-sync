@@ -95,6 +95,20 @@ export class RealtimeSyncClient {
     delete this.state[key];
   }
 
+  moveState = (key: string, value: any) => {
+    if (!this.ws) return;
+    const message = createDataUpdateMessage({
+      sessionId: '',
+      target: rtObjSync.TargetType.STATE,
+      opType: rtObjSync.Operation.MOV,
+      revision: 0,
+      targetKey: [key],
+      data: value
+    });
+    this.ws.send(message);
+    delete this.state[key];
+  }
+
   onError = () => {
     this.handler['error'].forEach((f: Function) => {f()})
   }

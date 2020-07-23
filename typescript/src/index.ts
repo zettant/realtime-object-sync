@@ -23,8 +23,7 @@
  */
 
 import {RealtimeSyncClient} from './client';
-import {IDocumentNode} from './document';
 import {convertDocumentNodeElement} from './utils';
 
-export {RealtimeSyncClient, IDocumentNode, convertDocumentNodeElement};
+export {RealtimeSyncClient, convertDocumentNodeElement};
 export default {RealtimeSyncClient};
