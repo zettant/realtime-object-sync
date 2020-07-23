@@ -31,16 +31,6 @@ export const DOCUMENT_NODE_NAME = '__DOCNODE__';
 const KEY_PRESERVE_LEVEL = 3;
 
 
-export interface IDocumentNode {
-  parent: IDocumentNode|null;
-  children: {[key: string]: IDocumentNode};
-  name: string;
-  level: number;
-  level1Key: string;
-  keys?: string[];
-  value: any;
-}
-
 export class DocumentObject {
   private client: RealtimeSyncClient;
   private document: any = null;
@@ -121,7 +111,7 @@ export class DocumentObject {
     return parent[key];
   }
 
-  public removeChild = (parent: any, key: string, noSync?: boolean) => {
+  public removeChildNode = (parent: any, key: string, noSync?: boolean) => {
     if (!parent[key]) return;
     console.log(">>>del:", this.dumpNode(parent));
     if (!noSync) this.delRemote(parent[DOCUMENT_NODE_NAME].keys.concat([key]));
@@ -137,8 +127,15 @@ export class DocumentObject {
 
   public getNodeAt = (keys: string[]): any => {
     let node: any = this.document;
-    keys.forEach((k) => {node = node[k]});
-    return node;
+    let flag = true;
+    keys.forEach((k) => {
+      if (!node[k]) {
+        flag = false;
+        return;
+      }
+      node = node[k]
+    });
+    return flag ? node : null;
   }
 
   private addRemote = (keys: string[], value: any) => {
