@@ -81,10 +81,9 @@ export class DocumentObject {
     }
     this.setNode(parent, node, nodeName, noSync);
 
-    console.log("****level=", node[DOCUMENT_NODE_NAME].level, nodeName, node);
+    //console.log("****level=", node[DOCUMENT_NODE_NAME].level, nodeName, node);
     Object.keys(node).forEach((name: string) => {
       if (name === DOCUMENT_NODE_NAME) return;
-      console.log("====>", name);
       if (node[DOCUMENT_NODE_NAME].level < this.autoNodeCreateLevel[node[DOCUMENT_NODE_NAME].level1Key]) { // 一定の階層までしか管理しない
         this.setChildNodeRecursive(node, node[name], name, noSync)
       }
@@ -103,10 +102,13 @@ export class DocumentObject {
     if (!noSync) this.addRemote(node[DOCUMENT_NODE_NAME].keys, node);
   }
 
-  public addChildNode = (parent: any, key: string, value: any, noSync?: boolean): any => {
+  public addChildNode = (parent: any, key: string, value: any, noSync?: boolean, noKeyCreate?: boolean): any => {
     parent[key] = value;
-    if (typeof value === 'object') {
+    if (typeof value === 'object' && !noKeyCreate) {
       this.setNode(parent, parent[key], key, noSync);
+    } else {
+      const keys = parent[DOCUMENT_NODE_NAME].keys.concat(key)
+      if (!noSync) this.addRemote(keys, value);
     }
     return parent[key];
   }
