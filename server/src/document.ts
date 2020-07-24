@@ -84,6 +84,7 @@ export class SyncDocument {
   setDocument = (data: string) => {
     if (Object.keys(this.document).length > 0) return; // すでに登録済みなら、更に上書きはしない
     // TODO: 初期データをセットするタイミングとセット前に他の人が編集してしまった場合の対処
+    //console.log("setDocument:", data);
     this.document = JSON.parse(data);
   }
 

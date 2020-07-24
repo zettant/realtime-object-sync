@@ -32,7 +32,7 @@ import {
   createDataUpdateMessage
 } from "./syncMessage";
 import {rtObjSync} from "./proto/messages";
-import {toBuffer} from './utils';
+import {toBuffer, replacer} from './utils';
 
 
 export class RealtimeSyncClient {
@@ -90,6 +90,20 @@ export class RealtimeSyncClient {
       opType: rtObjSync.Operation.DEL,
       revision: 0,
       targetKey: [key],
+    });
+    this.ws.send(message);
+    delete this.state[key];
+  }
+
+  moveState = (key: string, value: any) => {
+    if (!this.ws) return;
+    const message = createDataUpdateMessage({
+      sessionId: '',
+      target: rtObjSync.TargetType.STATE,
+      opType: rtObjSync.Operation.MOV,
+      revision: 0,
+      targetKey: [key],
+      data: value
     });
     this.ws.send(message);
     delete this.state[key];
@@ -184,7 +198,7 @@ export class RealtimeSyncClient {
         this.downloadedDocumentData = response.connected.data;
       }
       else if (initialData) {
-        sendDocumentUploadMessage(this.ws, initialData);
+        sendDocumentUploadMessage(this.ws, JSON.parse(JSON.stringify(initialData, replacer)));
       }
     }
 

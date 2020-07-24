@@ -22,6 +22,8 @@
  SOFTWARE.
  */
 
+import {DOCUMENT_NODE_NAME} from './document';
+
 /**
  * convert array buffer to buffer
  * @param arraybuffer
@@ -63,4 +65,9 @@ export const convertDocumentNodeElement = (target: any, opType: string, keys: st
   else {
     target[lastKey] = value;
   }
+}
+
+
+export const replacer = (key: string, value: any) => {
+  return key === DOCUMENT_NODE_NAME ? undefined : value;
 }
