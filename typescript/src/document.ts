@@ -64,7 +64,6 @@ export class DocumentObject {
 
     Object.keys(this.document[key]).forEach((name: string) => {
       if (name === DOCUMENT_NODE_NAME) return;
-      console.log(`[${key}][${name}] --> ${this.document[key][name]}`);
       this.setChildNodeRecursive(this.document[key], this.document[key][name], name, noSync)
     });
   }
@@ -81,7 +80,6 @@ export class DocumentObject {
     }
     this.setNode(parent, node, nodeName, noSync);
 
-    //console.log("****level=", node[DOCUMENT_NODE_NAME].level, nodeName, node);
     Object.keys(node).forEach((name: string) => {
       if (name === DOCUMENT_NODE_NAME) return;
       if (node[DOCUMENT_NODE_NAME].level < this.autoNodeCreateLevel[node[DOCUMENT_NODE_NAME].level1Key]) { // 一定の階層までしか管理しない
@@ -98,7 +96,6 @@ export class DocumentObject {
       level1Key: parent[DOCUMENT_NODE_NAME].level === 0 ? nodeName : parent[DOCUMENT_NODE_NAME].level1Key,
       keys: parent[DOCUMENT_NODE_NAME].keys.concat([nodeName])
     };
-    console.log(">>>set:", this.dumpNode(node));
     if (!noSync) this.addRemote(node[DOCUMENT_NODE_NAME].keys, node);
   }
 
@@ -115,7 +112,6 @@ export class DocumentObject {
 
   public removeChildNode = (parent: any, key: string, noSync?: boolean) => {
     if (!parent[key]) return;
-    console.log(">>>del:", this.dumpNode(parent));
     if (!noSync) this.delRemote(parent[DOCUMENT_NODE_NAME].keys.concat([key]));
     delete parent[key];
   }
