@@ -24,16 +24,28 @@
 
 import * as express from 'express';
 import * as http from 'http';
+import * as https from 'https';
 
 import {Logger} from './logger';
 import {ExtWebSocket} from './extWebsock';
 import {SyncServer} from './server';
+import * as fs from 'fs';
 
 Logger.init();
 const conf = require('config');
 
 const app = express();
-const server = http.createServer(app);
+let server: any;
+if (conf.cert && conf.cert.serverCert && conf.cert.serverKey && conf.cert.caCert) {
+  const options = {
+    key: fs.readFileSync( conf.cert.serverKey ),
+    cert: fs.readFileSync( conf.cert.serverCert ),
+    ca: fs.readFileSync( conf.cert.caCert ),
+  };
+  server = https.createServer(options, app);
+} else {
+  server = http.createServer(app);
+}
 
 
 export const serverInit = (server: any, config: any) => {
