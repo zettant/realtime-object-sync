@@ -36,7 +36,10 @@ const conf = require('config');
 
 const app = express();
 let server: any;
-if (conf.cert && conf.cert.serverCert && conf.cert.serverKey && conf.cert.caCert) {
+if (conf.cert && conf.cert.serverCert && conf.cert.serverKey && conf.cert.caCert &&
+  fs.existsSync(conf.cert.serverKey) &&
+  fs.existsSync(conf.cert.serverCert) &&
+  fs.existsSync(conf.cert.caCert)) {
   const options = {
     key: fs.readFileSync( conf.cert.serverKey ),
     cert: fs.readFileSync( conf.cert.serverCert ),

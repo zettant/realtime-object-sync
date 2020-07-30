@@ -9,7 +9,7 @@ const clientlib = env.library;
 
 const envName = env.envName;
 
-const serverURL = 'ws://localhost:8888';
+const serverURL = 'ws://127.0.0.1:8888';
 const token = 'eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJkb2N1bWVudE5hbWUiOiJ0ZXN0RG9jMSIsImlhdCI6MTU5NDk1MTkwOCwiZXhwIjoxNTk3NTQzOTA4LCJhdWQiOiJTeW5jU2VydmVyIn0.xRk9rlgxlI4OkylNKkheUfKZ_DmiKC8fEBm_iZhnI3Tgvj6WPXyVPD40WZB0vvkjADmikZCwjO-T4QgPMpZ9-Q';
 
 const sleep = (ms: number) => {

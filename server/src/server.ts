@@ -44,7 +44,7 @@ export class SyncServer {
     this.config = conf;
     this.wss = wss;
     this.wsDocMap = new Map<ExtWebSocket, string>();
-    this.pubkeyPem = this.config.keys.publicKey;
+    this.pubkeyPem = this.config.token.publicKey;
   }
 
   dispatch = (ws: ExtWebSocket, message: any) => {
