@@ -12,6 +12,4 @@ RUN yarn install
 # アプリケーションのソースをバンドルする
 COPY . .
 
-EXPOSE 8888
-
 CMD [ "yarn", "start" ]

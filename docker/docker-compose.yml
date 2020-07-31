@@ -1,0 +1,35 @@
+version: '2'
+
+services:
+  realtime-object-sync:
+    build: ../server
+    container_name: realtime-object-sync
+    tty: true
+    restart: always
+    expose:
+      - 8888
+    environment:
+      - "VIRTUAL_HOST=127.0.0.1"
+      - "VIRTUAL_PORT=8888"
+
+  nginx-proxy:
+    #image: sig9/nginx-proxy
+    image: jwilder/nginx-proxy:alpine
+    container_name: nginx-proxy
+    privileged: true
+    tty: false
+    ports:
+      - 8888:8888
+    volumes:
+      - ${PWD}/data/certs:/etc/nginx/certs:ro
+      - ${PWD}/data/nginx-proxy/htpasswd:/etc/nginx/htpasswd
+      - ${PWD}/data/nginx-proxy/vhost.d:/etc/nginx/vhost.d
+      - ${PWD}/data/nginx-proxy/html:/usr/share/nginx/html
+      - ${PWD}/data/nginx-proxy/config/nginx.tmpl:/app/nginx.tmpl
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+    restart: always
+    logging:
+      driver: journald
+      #    networks:
+      #      - common_link
+
