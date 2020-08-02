@@ -5,11 +5,12 @@ FROM node:14-alpine
 WORKDIR /usr/src/app
 
 # アプリケーションの依存関係をインストールする
-COPY package.json ./
+COPY server/package.json ./
 
 RUN yarn install
 
 # アプリケーションのソースをバンドルする
-COPY . .
+COPY server/ .
 
 CMD [ "yarn", "start" ]
+
