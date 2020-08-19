@@ -56,21 +56,17 @@ export class DocumentObject {
     };
   }
 
-  public makeTopNodeInDocument = (key: string, autoNodeLevel: number, noSync?: boolean) => {
+  public makeTopNodeInDocument = (key: string, autoNodeLevel: number, func: ((sessionId: string, opType: string, keys: string[], data: any)=>void)|null) => {
     this.autoNodeCreateLevel[key] = autoNodeLevel < 0 ? KEY_PRESERVE_LEVEL : autoNodeLevel;
 
-    this.setNode(this.document, this.document[key], key, noSync);
+    this.setNode(this.document, this.document[key], key, true);
     if (typeof this.document[key] !== 'object') return;
 
     Object.keys(this.document[key]).forEach((name: string) => {
       if (name === DOCUMENT_NODE_NAME) return;
-      this.setChildNodeRecursive(this.document[key], this.document[key][name], name, noSync)
+      this.setChildNodeRecursive(this.document[key], this.document[key][name], name, true)
     });
-  }
-
-  public addTopNode = (nodeName: string, node: any, noSync?: boolean) => {
-    this.document[nodeName] = node;
-    this.setChildNodeRecursive(this.document, this.document[nodeName], nodeName, noSync);
+    if (func) this.client.addListenerForDocumentMessage(key, func);
   }
 
   public setChildNodeRecursive = (parent: any, node: any, nodeName: string, noSync?: boolean) => {

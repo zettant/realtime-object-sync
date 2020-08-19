@@ -10,7 +10,6 @@ const clientlib = env.library;
 const envName = env.envName;
 
 const serverURL = 'ws://127.0.0.1:8888';
-const token = 'eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJkb2N1bWVudE5hbWUiOiJ0ZXN0RG9jMSIsImlhdCI6MTU5NDk1MTkwOCwiZXhwIjoxNTk3NTQzOTA4LCJhdWQiOiJTeW5jU2VydmVyIn0.xRk9rlgxlI4OkylNKkheUfKZ_DmiKC8fEBm_iZhnI3Tgvj6WPXyVPD40WZB0vvkjADmikZCwjO-T4QgPMpZ9-Q';
 
 const sleep = (ms: number) => {
   return new Promise( (resolve) => {
@@ -19,6 +18,7 @@ const sleep = (ms: number) => {
     }, ms);
   })
 }
+const token = "eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJkb2N1bWVudE5hbWUiOiJ0ZXN0RG9jMSIsImlhdCI6MTU5NzgwNjkxMCwiZXhwIjoxNjAwMzk4OTEwLCJhdWQiOiJTeW5jU2VydmVyIn0.I6nhfbjBYg8qn_1eaycziaYFDtNM8Gxg0a4fh5aO6ROkFVekYMxNfyhlr2TBH8ukQy8BndE9G7wvztlr-CV8DA";
 
 describe(`${envName}: rt-objsync-client`, async function () {
 

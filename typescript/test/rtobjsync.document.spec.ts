@@ -11,7 +11,7 @@ const clientlib = env.library;
 const envName = env.envName;
 
 const serverURL = 'ws://127.0.0.1:8888';
-const token = 'eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJkb2N1bWVudE5hbWUiOiJ0ZXN0RG9jMSIsImlhdCI6MTU5NDk1MTkwOCwiZXhwIjoxNTk3NTQzOTA4LCJhdWQiOiJTeW5jU2VydmVyIn0.xRk9rlgxlI4OkylNKkheUfKZ_DmiKC8fEBm_iZhnI3Tgvj6WPXyVPD40WZB0vvkjADmikZCwjO-T4QgPMpZ9-Q';
+const token = "eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJkb2N1bWVudE5hbWUiOiJ0ZXN0RG9jMSIsImlhdCI6MTU5NzgwNjkxMCwiZXhwIjoxNjAwMzk4OTEwLCJhdWQiOiJTeW5jU2VydmVyIn0.I6nhfbjBYg8qn_1eaycziaYFDtNM8Gxg0a4fh5aO6ROkFVekYMxNfyhlr2TBH8ukQy8BndE9G7wvztlr-CV8DA";
 
 const initialDocument = {
   'a1': {
@@ -66,8 +66,8 @@ describe(`${envName}: rt-objsync-client document modification`, async function (
     if (!rtClient.document) return;
 
     rtClient.document.setDocument(doc);
-    rtClient.document.makeTopNodeInDocument('a1', -1, true);
-    rtClient.document.makeTopNodeInDocument('b1', 3, true)
+    rtClient.document.makeTopNodeInDocument('a1', -1, null);
+    rtClient.document.makeTopNodeInDocument('b1', 3, null)
 
     //console.log(JSON.stringify(rtClient.document.getDocument()));
 
@@ -103,28 +103,26 @@ describe(`${envName}: rt-objsync-client document modification`, async function (
 
     if (!rtClients[0].document || !rtClients[1].document) return;
 
-    rtClients[0].document.setDocument(doc1);
-    rtClients[0].document.makeTopNodeInDocument('a1', -1, true);
-    rtClients[0].document.makeTopNodeInDocument('b1', 3, true);
-
-    rtClients[1].document.setDocument(doc2);
-    rtClients[1].document.makeTopNodeInDocument('a1', -1, true);
-    rtClients[1].document.makeTopNodeInDocument('b1', 3, true);
-
-
-    // ---- test1 changes document and test2 receives notification
     const docUpdateHandler2 = (sessionId: string, opType: string, keys: string[], data: any) => {
       console.log("doc >>>", sessionId, opType, keys, data);
       convertDocumentNodeElement(doc2, opType, keys, data);
     }
-    rtClients[1].processMessageForDocument = docUpdateHandler2;
 
+    rtClients[0].document.setDocument(doc1);
+    rtClients[0].document.makeTopNodeInDocument('a1', -1, docUpdateHandler2);
+    rtClients[0].document.makeTopNodeInDocument('b1', 3, docUpdateHandler2);
+
+    rtClients[1].document.setDocument(doc2);
+    rtClients[1].document.makeTopNodeInDocument('a1', -1, docUpdateHandler2);
+    rtClients[1].document.makeTopNodeInDocument('b1', 3, docUpdateHandler2);
+
+
+    // ---- test1 changes document and test2 receives notification
     const nodeAX = rtClients[0].document.getNodeAt(['ax']);
     expect(nodeAX).null;
 
     const nodeA1 = rtClients[0].document.getNodeAt(['a1']);
     rtClients[0].document.addChildNode(nodeA1, 'a2-3', {'a3-3-1': 200});
-    rtClients[0].document.addTopNode( 'c1', {'c2': 'YYYY'});
     //console.log("DUMP: ", rtClients[0].document.dumpNode());
 
     rtClients[0].document.addChildNode(nodeA1, 'a2-2', 'newString');
@@ -137,7 +135,6 @@ describe(`${envName}: rt-objsync-client document modification`, async function (
     console.log(JSON.stringify(doc2, replacer));
     expect(doc2.a1['a2-2']).equals('newString');
     expect(doc2.a1['a2-3']['a3-3-1']).equals(200);
-    expect(doc2.c1.c2).equals('YYYY');
     expect(doc2.b1['b2-3']['b3-1']).undefined;
 
     rtClients.forEach((c) => {

@@ -40,6 +40,7 @@ export class RealtimeSyncClient {
   public ws: WebSocket|null = null;
   private handler: any = {close: [], error: [], state: [], account: []};
   private messageHandler: Map<rtObjSync.Message.MessageType, (msg: rtObjSync.Message)=>void>;
+  private documentMessageHandler: Map<string, (sessionId: string, opType: string, keys: string[], data: any)=>void>;
   private allAccountGetHandler: ((msg: rtObjSync.Message) => void)| null = null;
   private messageQ: rtObjSync.Message[] = [];
   private isConnected = false;
@@ -51,6 +52,7 @@ export class RealtimeSyncClient {
 
   constructor() {
     this.messageHandler = new Map<rtObjSync.Message.MessageType, (msg: rtObjSync.Message)=>void>();
+    this.documentMessageHandler = new Map<string, (sessionId: string, opType: string, keys: string[], data: any)=>void>();
   }
 
   get sessionId() {
@@ -161,7 +163,11 @@ export class RealtimeSyncClient {
       this.messageQ.push(msg);
       return;
     }
-    this.processMessageForDocument(sessionId, opType, keys, data);
+    if (this.documentMessageHandler.has(keys[0])) {
+      const func = this.documentMessageHandler.get(keys[0]);
+      // @ts-ignore
+      func(sessionId, opType, keys, data);
+    }
   }
 
   public addListener = (target: string, func: Function) => {
@@ -189,6 +195,7 @@ export class RealtimeSyncClient {
     sendOpenMessage(this.ws, token, accountInfo);
 
     const response = await this.waitConnectedOrCloseMessage();
+    console.log(response);
     if (response.msgType === rtObjSync.Message.MessageType.CLOSE) return this.isConnected;
     this.document = new DocumentObject(this);
 
@@ -260,7 +267,12 @@ export class RealtimeSyncClient {
     });
   }
 
-  processMessageForDocument = (sessionId: string, opType: string, keys: string[], data: any) => { // should be overridden
-    console.log(`sessionId=${sessionId}, opType=${opType}, keys=${keys}, data=${data}`);
+  public addListenerForDocumentMessage = (nodeKey: string,
+                                          func: (sessionId: string, opType: string, keys: string[], data: any) =>void) => {
+    this.documentMessageHandler.set(nodeKey, func);
+  }
+
+  public removeListenerForDocumentMessage = (nodeKey: string) => {
+    this.documentMessageHandler.delete(nodeKey);
   }
 }

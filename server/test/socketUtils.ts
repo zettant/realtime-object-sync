@@ -88,7 +88,7 @@ export const generateJwt = (payload: {[key: string]: string}) => {
   };
   //const currentTime = Math.floor(new Date().getTime());
   // @ts-ignore
-  return jwt.sign(payload, config.keys.privateKey, jwtOptions);
+  return jwt.sign(payload, config.token.privateKey, jwtOptions);
 }
 
 export const generateInvalidJwt = (payload: {[key: string]: string}) => {

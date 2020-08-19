@@ -109,7 +109,7 @@ export class SyncServer {
     }
 
     if (!decoded.documentName) {
-      sendCloseMessage(ws, 1);
+      sendCloseMessage(ws, 2);
       return false;
     }
 
