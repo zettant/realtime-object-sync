@@ -251,6 +251,10 @@ export class RealtimeSyncClient {
         reject(false);
       } else {
         this.ws.onopen = () => resolve(true);
+        this.ws.onerror = (e) => {
+          console.log(e);
+          resolve(false);
+        }
       }
     });
   }

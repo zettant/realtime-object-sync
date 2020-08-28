@@ -22,8 +22,15 @@
  SOFTWARE.
  */
 
-import {RealtimeSyncClient} from './client';
-import {convertDocumentNodeElement} from './utils';
+// import {RealtimeSyncClient as rtc} from './client';
+// import {convertDocumentNodeElement as cdne, replacer as rep} from './utils';
+//
+// export const RealtimeSyncClient = rtc;
+// export const convertDocumentNodeElement = cdne;
+// export const replacer = rep;
 
-export {RealtimeSyncClient, convertDocumentNodeElement};
-export default {RealtimeSyncClient};
+import {RealtimeSyncClient} from './client';
+import {convertDocumentNodeElement, replacer} from './utils';
+
+export {RealtimeSyncClient, convertDocumentNodeElement, replacer};
+export default {RealtimeSyncClient, convertDocumentNodeElement, replacer};
