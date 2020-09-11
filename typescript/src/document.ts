@@ -74,8 +74,11 @@ export class DocumentObject {
     if (Object.prototype.toString.call(parent[nodeName]) !== '[object Object]') return;
 
     const keys = parent[DOCUMENT_META_NODE].keys.concat(nodeName);
-    this.setMetaNode(parent, nodeName, keys);
+    if (parent[DOCUMENT_META_NODE].level < this.autoNodeCreateLevel[parent[DOCUMENT_META_NODE].level1Key]) {
+      this.setMetaNode(parent, nodeName, keys);
+    }
 
+    if (!parent[nodeName][DOCUMENT_META_NODE]) return;
     Object.keys(parent[nodeName]).forEach((name: string) => {
       if (name === DOCUMENT_META_NODE) return;
       if (parent[nodeName][DOCUMENT_META_NODE].level < this.autoNodeCreateLevel[parent[nodeName][DOCUMENT_META_NODE].level1Key]) { // 一定の階層までしか管理しない
@@ -95,7 +98,7 @@ export class DocumentObject {
   }
 
   public addChildNode = (parent: any, key: string, value: any, noSync?: boolean): any => {
-    if (!parent[DOCUMENT_META_NODE]) return null;  // 親が管理下になければ子を追加できない
+    if (!parent[DOCUMENT_META_NODE]) return null; // 親が管理下になければ子を追加できない
     const keys = parent[DOCUMENT_META_NODE].keys.concat(key)
 
     parent[key] = value;
