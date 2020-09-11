@@ -22,7 +22,7 @@
  SOFTWARE.
  */
 
-import {DOCUMENT_NODE_NAME} from './document';
+import {DOCUMENT_META_NODE} from './document';
 
 /**
  * convert array buffer to buffer
@@ -69,5 +69,5 @@ export const convertDocumentNodeElement = (target: any, opType: string, keys: st
 
 
 export const replacer = (key: string, value: any) => {
-  return key === DOCUMENT_NODE_NAME ? undefined : value;
+  return key === DOCUMENT_META_NODE ? undefined : value;
 }

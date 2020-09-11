@@ -81,7 +81,10 @@ export const serverInit = (server: any, config: any) => {
     wss.clients.forEach((ws: ExtWebSocket) => {
       if (!ws.isAlive) return ws.terminate();
       ws.isAlive = false;
-      ws.ping(null, false);
+      try {
+        // ping will crash if ws is closed (timing problem)
+        ws.ping(null, false);
+      } catch (e) {}
     })}, 10000);
 }
 

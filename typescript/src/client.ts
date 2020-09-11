@@ -111,8 +111,8 @@ export class RealtimeSyncClient {
     delete this.state[key];
   }
 
-  onError = () => {
-    this.handler['error'].forEach((f: Function) => {f()})
+  onError = (e?: any) => {
+    this.handler['error'].forEach((f: Function) => {f(e)})
   }
 
   onClose = () => {
@@ -197,6 +197,8 @@ export class RealtimeSyncClient {
     const response = await this.waitConnectedOrCloseMessage();
     console.log(response);
     if (response.msgType === rtObjSync.Message.MessageType.CLOSE) return this.isConnected;
+
+    this.ws.addEventListener('error', this.onError);
     this.document = new DocumentObject(this);
 
     if (response.connected && response.connected.sessionId) {
