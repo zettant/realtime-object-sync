@@ -1,13 +1,9 @@
-import * as chai from 'chai';
-const expect = chai.expect;
-
 import {getTestEnv} from './prepare';
 import {RealtimeSyncClient} from '../src';
+import {testToken} from './token';
 
 const env = getTestEnv();
 const clientlib = env.library;
-
-const envName = env.envName;
 
 const serverURL = 'ws://127.0.0.1:8888';
 
@@ -18,13 +14,15 @@ const sleep = (ms: number) => {
     }, ms);
   })
 }
-const token = "eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJkb2N1bWVudE5hbWUiOiJ0ZXN0RG9jMSIsImlhdCI6MTU5NzgwNjkxMCwiZXhwIjoxNjAwMzk4OTEwLCJhdWQiOiJTeW5jU2VydmVyIn0.I6nhfbjBYg8qn_1eaycziaYFDtNM8Gxg0a4fh5aO6ROkFVekYMxNfyhlr2TBH8ukQy8BndE9G7wvztlr-CV8DA";
 
-describe(`${envName}: rt-objsync-client`, async function () {
+const token = testToken;
 
-  before(async function () {
+describe(`${env.envName}: rt-objsync-client`, function () {
+
+  beforeEach(() => {
     console.log("# NOTE: Please start realtime-object-sync server at localhost:8888");
-    this.timeout(100000);
+    if(typeof window === 'undefined') jest.setTimeout(10000);
+    else try{ jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000;} catch { console.log('possibly will timeout...')}
   });
 
   it('single user connects with server and disconnects', async function () {
@@ -33,6 +31,7 @@ describe(`${envName}: rt-objsync-client`, async function () {
 
     rtClient.close();
     rtClient.disconnect();
+    await sleep(1000);
   });
 
   it('two users connect with server and get account info', async function () {
@@ -48,7 +47,7 @@ describe(`${envName}: rt-objsync-client`, async function () {
 
     // ---- test2 gets all accounts
     const allAccounts = await rtClients[1].getAllAccounts();
-    expect(Object.keys(allAccounts).length).equals(2);
+    expect(Object.keys(allAccounts).length).toBe(2);
     console.log(allAccounts);
 
     rtClients.forEach((c) => {
@@ -58,7 +57,6 @@ describe(`${envName}: rt-objsync-client`, async function () {
   });
 
   it('two users connect with server and update their states', async function () {
-    this.timeout(100000);
     const rtClients: RealtimeSyncClient[] = [];
     rtClients.push(new clientlib.RealtimeSyncClient());
     rtClients.push(new clientlib.RealtimeSyncClient());
@@ -70,21 +68,21 @@ describe(`${envName}: rt-objsync-client`, async function () {
     // ---- test1 changes its account info and test2 receives notification
     const funcAccount = (sessionId: string|null, opType: string, info: any) => {
       console.log("account >>>", sessionId, opType, info);
-      expect(opType).equals('ADD');
-      expect(info.email).equals('test2-1@example.com');
-      expect(info.displayName).equals('test2-1');
+      expect(opType).toBe('ADD');
+      expect(info.email).toBe('test2@example.com');
+      expect(info.displayName).toBe('test2');
     }
     rtClients[0].addListener('account', funcAccount);
-    rtClients[1].account = {email: 'test2-1@example.com', displayName: 'test2-1'};
+    rtClients[1].account = {email: 'test2@example.com', displayName: 'test2'};
 
     // ---- test2 changes its state info and test1 receives notification
     const funcState = (sessionId: string, opType: string, keys: any, data: any) => {
       console.log("state >>>", sessionId, opType, keys, data);
-      expect(keys.length).equals(1);
-      expect(keys[0]).equals('item1');
+      expect(keys.length).toBe(1);
+      expect(keys[0]).toBe('item1');
       if (opType === 'ADD') {
-        expect(data.x).equals(10);
-        expect(data.y).equals(20);
+        expect(data.x).toBe(10);
+        expect(data.y).toBe(20);
       }
     }
     rtClients[1].addListener('state', funcState);
@@ -95,7 +93,8 @@ describe(`${envName}: rt-objsync-client`, async function () {
     rtClients.forEach((c) => {
       c.close();
       c.disconnect();
-    })
+    });
+    await sleep(2000);
   });
 
 });

@@ -22,7 +22,8 @@
  SOFTWARE.
  */
 
-import {rtObjSync} from "./proto/messages";
+//import {rtObjSync} from "./proto/messages.js";
+const rtObjSync = require("./proto/messages.js").rtObjSync;
 
 export interface IDataUpdate {
   sessionId: string,

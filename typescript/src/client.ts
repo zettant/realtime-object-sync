@@ -195,7 +195,7 @@ export class RealtimeSyncClient {
     sendOpenMessage(this.ws, token, accountInfo);
 
     const response = await this.waitConnectedOrCloseMessage();
-    console.log(response);
+    //console.log("=======>", response);
     if (response.msgType === rtObjSync.Message.MessageType.CLOSE) return this.isConnected;
 
     this.ws.addEventListener('error', this.onError);

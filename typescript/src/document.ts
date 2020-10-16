@@ -70,7 +70,7 @@ export class DocumentObject {
   }
 
   public setChildMetaNodeRecursive = (parent: any, nodeName: string) => {
-    if (!parent[DOCUMENT_META_NODE]) return null;  // 親が管理下になければ子を追加できない
+    if (!parent[DOCUMENT_META_NODE]) return;  // 親が管理下になければ子を追加できない
     if (Object.prototype.toString.call(parent[nodeName]) !== '[object Object]') return;
 
     const keys = parent[DOCUMENT_META_NODE].keys.concat(nodeName);
@@ -101,8 +101,10 @@ export class DocumentObject {
     if (!parent[DOCUMENT_META_NODE]) return null; // 親が管理下になければ子を追加できない
     const keys = parent[DOCUMENT_META_NODE].keys.concat(key)
 
-    parent[key] = value;
-    if (Object.prototype.toString.call(value) === '[object Object]') {
+    if (typeof value !== 'undefined') {
+      parent[key] = value;
+    }
+    if (Object.prototype.toString.call(parent[key]) === '[object Object]') {
       this.setChildMetaNodeRecursive(parent, key);
     }
 
