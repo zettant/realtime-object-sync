@@ -625,13 +625,22 @@
     "@types/qs" "*"
     "@types/range-parser" "*"
 
-"@types/express@^4.17.7":
-  version "4.17.7"
-  resolved "https://registry.yarnpkg.com/@types/express/-/express-4.17.7.tgz#42045be6475636d9801369cd4418ef65cdb0dd59"
-  integrity sha512-dCOT5lcmV/uC2J9k0rPafATeeyz+99xTt54ReX11/LObZgfzJqZNcW27zGhYyX+9iSEGXGt5qLPwRSvBZcLvtQ==
+"@types/express-serve-static-core@^4.17.18":
+  version "4.17.21"
+  resolved "https://registry.yarnpkg.com/@types/express-serve-static-core/-/express-serve-static-core-4.17.21.tgz#a427278e106bca77b83ad85221eae709a3414d42"
+  integrity sha512-gwCiEZqW6f7EoR8TTEfalyEhb1zA5jQJnRngr97+3pzMaO1RKoI1w2bw07TK72renMUVWcWS5mLI6rk1NqN0nA==
+  dependencies:
+    "@types/node" "*"
+    "@types/qs" "*"
+    "@types/range-parser" "*"
+
+"@types/express@4.17.12":
+  version "4.17.12"
+  resolved "https://registry.yarnpkg.com/@types/express/-/express-4.17.12.tgz#4bc1bf3cd0cfe6d3f6f2853648b40db7d54de350"
+  integrity sha512-pTYas6FrP15B1Oa0bkN5tQMNqOcVXa9j4FTFtO8DWI9kppKib+6NJtfTOOLcwxuuYvcX2+dVG6et1SxW/Kc17Q==
   dependencies:
     "@types/body-parser" "*"
-    "@types/express-serve-static-core" "*"
+    "@types/express-serve-static-core" "^4.17.18"
     "@types/qs" "*"
     "@types/serve-static" "*"
 
@@ -1470,6 +1479,11 @@ combined-stream@^1.0.6, combined-stream@~1.0.6:
   integrity sha512-FQN4MRfuJeHf7cBbBMJFXhKSDq+2kAArBlmRBvcvFE5BB1HZKXtSFASDhdlz9zOYwxh8lDdnvmMOe/+5cdoEdg==
   dependencies:
     delayed-stream "~1.0.0"
+
+commander@4.0.1:
+  version "4.0.1"
+  resolved "https://registry.yarnpkg.com/commander/-/commander-4.0.1.tgz#b67622721785993182e807f4883633e6401ba53c"
+  integrity sha512-IPF4ouhCP+qdlcmCedhxX4xiGBPyigb8v5NeUp+0LyhwLgxMqyp3S0vl7TAPfS/hiP7FC3caI/PB9lTmP8r1NA==
 
 component-bind@1.0.0:
   version "1.0.0"
@@ -4171,6 +4185,14 @@ path-type@^1.0.0:
     pify "^2.0.0"
     pinkie-promise "^2.0.0"
 
+pbjs@^0.0.14:
+  version "0.0.14"
+  resolved "https://registry.yarnpkg.com/pbjs/-/pbjs-0.0.14.tgz#5ab3d4a5f06a9ab78dd320c63f72877120d4c48d"
+  integrity sha512-F4aA0ojrQ37kxFPOg4yRLP/vxb76rYQwMQigmVEljYlA7hZKmjaWjP6IkRn4nA0NdIj4Xxe4iqWrrIhJy+MwWQ==
+  dependencies:
+    commander "4.0.1"
+    protocol-buffers-schema "3.1.0"
+
 performance-now@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/performance-now/-/performance-now-2.1.0.tgz#6309f4e0e5fa913ec1c69307ae364b4b377c9e7b"
@@ -4288,6 +4310,11 @@ protobufjs@^6.10.0:
     "@types/long" "^4.0.1"
     "@types/node" "^13.7.0"
     long "^4.0.0"
+
+protocol-buffers-schema@3.1.0:
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/protocol-buffers-schema/-/protocol-buffers-schema-3.1.0.tgz#d8a819549ead3e6bd189ebe9e50e96636bbc5cc7"
+  integrity sha1-2KgZVJ6tPmvRievp5Q6WY2u8XMc=
 
 proxy-addr@~2.0.5:
   version "2.0.6"
