@@ -1471,6 +1471,11 @@ combined-stream@^1.0.6, combined-stream@~1.0.6:
   dependencies:
     delayed-stream "~1.0.0"
 
+commander@4.0.1:
+  version "4.0.1"
+  resolved "https://registry.yarnpkg.com/commander/-/commander-4.0.1.tgz#b67622721785993182e807f4883633e6401ba53c"
+  integrity sha512-IPF4ouhCP+qdlcmCedhxX4xiGBPyigb8v5NeUp+0LyhwLgxMqyp3S0vl7TAPfS/hiP7FC3caI/PB9lTmP8r1NA==
+
 component-bind@1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/component-bind/-/component-bind-1.0.0.tgz#00c608ab7dcd93897c0009651b1d3a8e1e73bbd1"
@@ -4171,6 +4176,14 @@ path-type@^1.0.0:
     pify "^2.0.0"
     pinkie-promise "^2.0.0"
 
+pbjs@^0.0.14:
+  version "0.0.14"
+  resolved "https://registry.yarnpkg.com/pbjs/-/pbjs-0.0.14.tgz#5ab3d4a5f06a9ab78dd320c63f72877120d4c48d"
+  integrity sha512-F4aA0ojrQ37kxFPOg4yRLP/vxb76rYQwMQigmVEljYlA7hZKmjaWjP6IkRn4nA0NdIj4Xxe4iqWrrIhJy+MwWQ==
+  dependencies:
+    commander "4.0.1"
+    protocol-buffers-schema "3.1.0"
+
 performance-now@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/performance-now/-/performance-now-2.1.0.tgz#6309f4e0e5fa913ec1c69307ae364b4b377c9e7b"
@@ -4288,6 +4301,11 @@ protobufjs@^6.10.0:
     "@types/long" "^4.0.1"
     "@types/node" "^13.7.0"
     long "^4.0.0"
+
+protocol-buffers-schema@3.1.0:
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/protocol-buffers-schema/-/protocol-buffers-schema-3.1.0.tgz#d8a819549ead3e6bd189ebe9e50e96636bbc5cc7"
+  integrity sha1-2KgZVJ6tPmvRievp5Q6WY2u8XMc=
 
 proxy-addr@~2.0.5:
   version "2.0.6"
@@ -5372,10 +5390,10 @@ typedarray-to-buffer@^3.1.5:
   dependencies:
     is-typedarray "^1.0.0"
 
-typescript@^3.9.6:
-  version "3.9.6"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.9.6.tgz#8f3e0198a34c3ae17091b35571d3afd31999365a"
-  integrity sha512-Pspx3oKAPJtjNwE92YS05HQoY7z2SFyOpHo9MqJor3BXAGNaPUs83CuVp9VISFkSjyRfiTpmKuAYGJB7S7hOxw==
+typescript@3.9.10:
+  version "3.9.10"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.9.10.tgz#70f3910ac7a51ed6bef79da7800690b19bf778b8"
+  integrity sha512-w6fIxVE/H1PkLKcCPsFqKE7Kv7QUwhU8qQY2MueZXWx5cPZdwFupLgKK3vntcK98BtNHZtAF4LA/yl2a7k8R6Q==
 
 undefsafe@^2.0.2:
   version "2.0.3"
