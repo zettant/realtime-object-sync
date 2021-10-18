@@ -22,7 +22,7 @@
     "analyze": "cross-env NODE_ENV=production webpack --mode production --optimize-minimize --json --config webpack.prod.js | webpack-bundle-size-analyzer"
   },
   "devDependencies": {
-    "@types/jest": "26.0.14",
+    "@types/jest": "26.0.24",
     "@types/node": "14.11.8",
     "@typescript-eslint/eslint-plugin": "^4.4.1",
     "@typescript-eslint/parser": "^4.4.1",
