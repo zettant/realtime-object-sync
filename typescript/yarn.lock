@@ -5385,10 +5385,10 @@ jest@26.5.3:
     import-local "^3.0.2"
     jest-cli "^26.5.3"
 
-js-encoding-utils@0.5.6:
-  version "0.5.6"
-  resolved "https://registry.yarnpkg.com/js-encoding-utils/-/js-encoding-utils-0.5.6.tgz#517351d8f4a85b2ad121183d41df8319981bee03"
-  integrity sha512-qnAGsUIWrmzh5n+3AXqbxX1KsB9hkQmJZf3aA9DLAS7GpL/NEHCBreFFbW+imramoU+Q0TDyvkwhRbBRH1TVkg==
+js-encoding-utils@0.7.1:
+  version "0.7.1"
+  resolved "https://registry.yarnpkg.com/js-encoding-utils/-/js-encoding-utils-0.7.1.tgz#2c1a4b83e3437ccd7b84add3d3af9ae142eb9d3a"
+  integrity sha512-b17H4Se1eCMiAyLZ0WloE6Y9ilsggI0XnJsRKAxYxJQyRlNtunwjkvppxJwpsyT7n/5zmEIg2of7sKJWj7qcxA==
 
 js-tokens@^4.0.0:
   version "4.0.0"
